@@ -1,0 +1,110 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Studio</title>
+
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/editor.css">
+    <link rel="stylesheet" href="css/bookshelf.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div id="app-loader" style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
+        <span class="loader"></span>
+        <p style="margin-top: 20px; color: var(--text-secondary);">Завантаження Writing Studio...</p>
+    </div>
+
+    <div id="app-container" class="app-container" style="display: none;">
+        <div id="bookshelf-container"></div>
+
+        <div class="main-content">
+            <nav class="tabs-container">
+                <button class="tab active" data-tab="editor">
+                    ✍ Редактор
+                </button>
+                <button class="tab" data-tab="characters">
+                    👥 ✧ Персонажі
+                </button>
+                <button class="tab" data-tab="terms">
+                    📖 Терміни
+                </button>
+                <button class="tab" data-tab="timeline">
+                    ⏰ ⌛ Хронологія
+                </button>
+            </nav>
+
+            <main id="page-content" class="content-area">
+                <div style="text-align: center; padding: 50px; color: #999;">
+                    <h2>Завантаження...</h2>
+                    <p>Підготовка робочого простору</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal" style="max-width: 400px;">
+            <div class="modal-header">
+                <h2 id="auth-modal-title">Вхід у систему</h2>
+            </div>
+
+            <div class="modal-content">
+                <form id="login-form" style="display: block;">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" name="password" required>
+                    </div>
+
+                    <button type="submit" class="btn primary full-width">Увійти</button>
+
+                    <p style="text-align: center; margin-top: 20px;">
+                        Немає акаунту?
+                        <a href="#" id="show-register" style="color: var(--primary-gold);">Зареєструватись</a>
+                    </p>
+                </form>
+
+                <form id="register-form" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Ім'я</label>
+                        <input type="text" class="form-input" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Пароль</label>
+                        <input type="password" class="form-input" name="password" required minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Підтвердження паролю</label>
+                        <input type="password" class="form-input" name="password-confirm" required minlength="6">
+                    </div>
+
+                    <button type="submit" class="btn primary full-width">Зареєструватись</button>
+
+                    <p style="text-align: center; margin-top: 20px;">
+                        Вже є акаунт?
+                        <a href="#" id="show-login" style="color: var(--primary-gold);">Увійти</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

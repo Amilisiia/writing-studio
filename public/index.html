@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writing Studio - Платформа для письменників</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <style>
+        .landing-page {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .landing-hero {
+            max-width: 800px;
+            margin-bottom: 60px;
+        }
+
+            .landing-hero h1 {
+                font-size: 48px;
+                color: var(--book-brown);
+                margin-bottom: 20px;
+                font-family: var(--font-serif);
+            }
+
+            .landing-hero p {
+                font-size: 20px;
+                color: var(--text-secondary);
+                margin-bottom: 40px;
+            }
+
+        .landing-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin-bottom: 60px;
+        }
+
+        .feature-card {
+            background: var(--bg-white);
+            padding: 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            color: var(--book-brown);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .landing-hero h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <div class="landing-hero">
+            <h1>✍️ Writing Studio</h1>
+            <p>Комплексна система для організації творчого процесу письменників та сценаристів</p>
+            <a href="app.html" class="btn primary" style="font-size: 18px; padding: 15px 40px;">
+                Почати писати
+            </a>
+        </div>
+
+        <div class="landing-features">
+            <div class="feature-card">
+                <div class="feature-icon">📝</div>
+                <h3>Потужний редактор</h3>
+                <p>Редактор з форматуванням, автозбереженням та детальною статистикою</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">👥</div>
+                <h3>Управління персонажами</h3>
+                <p>Створюйте детальні досьє ваших героїв та антагоністів</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📖</div>
+                <h3>Словник термінів</h3>
+                <p>Організуйте всі важливі терміни та поняття вашого світу</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⏰</div>
+                <h3>Часова лінія</h3>
+                <p>Візуалізуйте хронологію подій у вашій історії</p>
+            </div>
+        </div>
+
+        <footer style="color: var(--text-light); margin-top: 40px;">
+            <p>Writing Studio © 2025 | Дипломний проект</p>
+        </footer>
+    </div>
+</body>
+</html>

@@ -137,3 +137,15 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# VS Code
+.vscode/
+.vs/
+*.vsidx
+*.db
+*.db-shm
+*.db-wal
+*.wsuo
+.CopilotIndices/
+FileContentIndex/
+v17/
