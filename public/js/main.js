@@ -1,5 +1,7 @@
 ﻿import auth from './core/Auth.js';
 import eventBus from './core/EventBus.js';
+import router from './core/Router.js';
+window.router = router;
 
 class App {
     constructor() {
@@ -154,6 +156,8 @@ class App {
     showApp() {
         if (this.appLoader) this.appLoader.style.display = 'none';
         if (this.appContainer) this.appContainer.style.display = 'block';
+
+        router.init();
 
         console.log('✅ Додаток завантажено');
     }
