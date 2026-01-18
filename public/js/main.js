@@ -28,6 +28,42 @@ class App {
         }
     }
 
+    async loadComponents() {
+        try {
+            const response = await fetch('components/bookshelf.html');
+            if (response.ok) {
+                const html = await response.text();
+                const container = document.getElementById('bookshelf-container');
+                if (container) {
+                    container.innerHTML = html;
+                    console.log('✅ Bookshelf component завантажено');
+                }
+            }
+        } catch (error) {
+            console.error('❌ Помилка завантаження компонентів:', error);
+        }
+    }
+
+    async loadComponents() {
+        try {
+            const response = await fetch('components/bookshelf.html');
+            if (response.ok) {
+                const html = await response.text();
+                const container = document.getElementById('bookshelf-container');
+                if (container) {
+                    container.innerHTML = html;
+                    console.log('✅ Bookshelf component завантажено');
+                } else {
+                    console.error('❌ bookshelf-container не знайдено');
+                }
+            } else {
+                console.error('❌ Не вдалося завантажити bookshelf.html');
+            }
+        } catch (error) {
+            console.error('❌ Помилка завантаження компонентів:', error);
+        }
+    }
+
     findElements() {
         this.authModal = document.getElementById('auth-modal');
         this.loginForm = document.getElementById('login-form');
@@ -153,13 +189,30 @@ class App {
         }
     }
 
-    showApp() {
+    async showApp() {
         if (this.appLoader) this.appLoader.style.display = 'none';
         if (this.appContainer) this.appContainer.style.display = 'block';
 
+        await this.loadComponents();
+
         router.init();
 
+        await this.initializeBookshelf();
+
         console.log('✅ Додаток завантажено');
+    }
+
+    async initializeBookshelf() {
+        try {
+            const { default: Bookshelf } = await import('./modules/Bookshelf/Bookshelf.js');
+            const bookshelf = new Bookshelf();
+            await bookshelf.init();
+
+            window.bookshelf = bookshelf;
+
+        } catch (error) {
+            console.error('❌ Помилка ініціалізації Bookshelf:', error);
+        }
     }
 
     hideApp() {
