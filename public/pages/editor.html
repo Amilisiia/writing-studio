@@ -1,0 +1,393 @@
+﻿<meta charset="UTF-8">
+<div class="editor-page" id="editorPage">
+    <div class="editor-toolbar">
+        <div class="toolbar-left">
+            <div class="book-selector" style="display: none;">
+                <i class="fas fa-book"></i>
+                <select class="form-select compact" id="bookSelect">
+                    <option value="">Оберіть книгу...</option>
+                </select>
+            </div>
+
+            <div class="chapter-selector">
+                <i class="fas fa-file-alt"></i>
+                <select class="form-select compact" id="chapterSelect">
+                    <option value="">Оберіть главу...</option>
+                </select>
+            </div>
+
+            <button class="btn-icon" id="newChapterBtn" title="Нова глава">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+
+        <div class="toolbar-center">
+            <div class="quick-stats">
+                <div class="stat-mini">
+                    <span id="wordCount">0</span>
+                    <label>Слова</label>
+                </div>
+                <div class="stat-mini">
+                    <span id="charCount">0</span>
+                    <label>Символи</label>
+                </div>
+                <div class="stat-mini">
+                    <span id="readTime">0 хв</span>
+                    <label>Читання</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar-right">
+            <button class="btn-icon" id="saveBtn" title="Зберегти">
+                <i class="fas fa-save"></i>
+            </button>
+            <button class="btn-icon" id="settingsBtn" title="Налаштування">
+                <i class="fas fa-cog"></i>
+            </button>
+            <button class="btn-icon" id="toggleSidebarBtn" title="Показати/Сховати бокову панель">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="editor-main-area">
+        <div class="editor-sidebar" id="editorSidebar">
+            <div class="sidebar-section">
+                <h4><i class="fas fa-list"></i> Структура</h4>
+                <div class="chapters-outline" id="chaptersOutline">
+                </div>
+                <button class="btn btn-primary btn-small btn-full-width" id="addChapterBtn">
+                    <i class="fas fa-plus"></i> Додати главу
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h4><i class="fas fa-tools"></i> Інструменти</h4>
+                <div class="quick-tools">
+                    <button class="tool-btn" id="insertCharacterBtn" title="Вставити персонажа">
+                        <i class="fas fa-user"></i>
+                        <span>Персонаж</span>
+                    </button>
+                    <button class="tool-btn" id="insertTermBtn" title="Вставити термін">
+                        <i class="fas fa-book-open"></i>
+                        <span>Термін</span>
+                    </button>
+                    <button class="tool-btn" id="insertNoteBtn" title="Нотатка автора">
+                        <i class="fas fa-sticky-note"></i>
+                        <span>Нотатка</span>
+                    </button>
+                    <button class="tool-btn" id="sceneBreakBtn" title="Розділювач сцен">
+                        <i class="fas fa-ellipsis-h"></i>
+                        <span>Розділювач</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h4><i class="fas fa-bullseye"></i> Денна ціль</h4>
+                <div class="writing-goal">
+                    <div class="goal-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
+                        </div>
+                        <div class="goal-text">
+                            <span id="currentGoal">0</span> / <span id="targetGoal">1000</span> слів
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary btn-small btn-full-width" id="setGoalBtn">
+                        Встановити ціль
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h4><i class="fas fa-history"></i> Автозбереження</h4>
+                <div class="save-history" id="saveHistory">
+                    <div class="save-item current">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Збережено</span>
+                        <time>тільки що</time>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="editor-content-area">
+            <div class="chapter-header-section">
+                <input type="text"
+                       class="chapter-title-input"
+                       id="chapterTitle"
+                       placeholder="Назва глави...">
+
+                <div class="chapter-metadata">
+                    <div class="metadata-item">
+                        <label>Номер глави</label>
+                        <input type="number" class="form-input small" id="chapterNumber" min="1" value="1">
+                    </div>
+
+                    <div class="metadata-item">
+                        <label>Точка зору (POV)</label>
+                        <input type="text" class="form-input small" id="chapterPOV" placeholder="Від імені кого...">
+                    </div>
+
+                    <div class="metadata-item">
+                        <label>Персонажі</label>
+                        <div class="characters-tags" id="chapterCharacters">
+                            <button class="add-character-tag" id="addCharacterTagBtn">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-editor-container">
+                <div class="editor-toolbar-text">
+                    <div class="format-group">
+                        <button class="format-btn" data-command="bold" title="Жирний (Ctrl+B)">
+                            <i class="fas fa-bold"></i>
+                        </button>
+                        <button class="format-btn" data-command="italic" title="Курсив (Ctrl+I)">
+                            <i class="fas fa-italic"></i>
+                        </button>
+                        <button class="format-btn" data-command="underline" title="Підкреслений (Ctrl+U)">
+                            <i class="fas fa-underline"></i>
+                        </button>
+                    </div>
+
+                    <div class="format-group">
+                        <select class="format-select" id="headingSelect">
+                            <option value="p">Звичайний текст</option>
+                            <option value="h1">Заголовок 1</option>
+                            <option value="h2">Заголовок 2</option>
+                            <option value="h3">Заголовок 3</option>
+                        </select>
+                    </div>
+
+                    <div class="format-group">
+                        <button class="format-btn" data-command="insertUnorderedList" title="Маркований список">
+                            <i class="fas fa-list-ul"></i>
+                        </button>
+                        <button class="format-btn" data-command="insertOrderedList" title="Нумерований список">
+                            <i class="fas fa-list-ol"></i>
+                        </button>
+                    </div>
+
+                    <div class="format-group">
+                        <button class="format-btn" data-command="justifyLeft" title="Вліво">
+                            <i class="fas fa-align-left"></i>
+                        </button>
+                        <button class="format-btn" data-command="justifyCenter" title="По центру">
+                            <i class="fas fa-align-center"></i>
+                        </button>
+                        <button class="format-btn" data-command="justifyRight" title="Вправо">
+                            <i class="fas fa-align-right"></i>
+                        </button>
+                        <button class="format-btn" data-command="justifyFull" title="По ширині">
+                            <i class="fas fa-align-justify"></i>
+                        </button>
+                    </div>
+
+                    <div class="format-group">
+                        <button class="format-btn" id="blockquoteBtn" title="Цитата">
+                            <i class="fas fa-quote-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="format-group">
+                        <button class="format-btn" id="focusModeBtn" title="Режим фокусу">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="format-btn" id="fullscreenBtn" title="Повноекранний режим">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="text-editor"
+                     id="textEditor"
+                     contenteditable="true"
+                     spellcheck="true">
+                    <p>Почніть писати вашу історію...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="editor-status-bar">
+        <div class="status-left">
+            <div class="status-item">
+                <i class="fas fa-check-circle"></i>
+                <span id="saveStatus">Збережено</span>
+            </div>
+        </div>
+
+        <div class="status-center">
+            <div class="detailed-stats">
+                <span class="stat-detailed">
+                    Слів: <strong id="detailedWordCount">0</strong>
+                </span>
+                <span class="stat-detailed">
+                    Символів (з пробілами): <strong id="detailedCharCountWith">0</strong>
+                </span>
+                <span class="stat-detailed">
+                    Символів (без пробілів): <strong id="detailedCharCountWithout">0</strong>
+                </span>
+                <span class="stat-detailed">
+                    Абзаців: <strong id="paragraphCount">0</strong>
+                </span>
+            </div>
+        </div>
+
+        <div class="status-right">
+            <div class="status-item">
+                <i class="fas fa-clock"></i>
+                <span id="lastSaved">Ніколи</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+    <div class="modal large">
+        <div class="modal-header">
+            <h3>⚙️ Налаштування редактора</h3>
+            <button class="btn-close" id="closeSettingsBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <div class="settings-tabs">
+                <button class="settings-tab active" data-tab="appearance">Вигляд</button>
+                <button class="settings-tab" data-tab="writing">Написання</button>
+                <button class="settings-tab" data-tab="export">Експорт</button>
+            </div>
+
+            <div class="settings-content">
+                <div class="settings-panel active" id="appearancePanel">
+                    <div class="setting-group">
+                        <label class="setting-label">Тема</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="light">Світла</option>
+                            <option value="dark">Темна</option>
+                            <option value="sepia">Сепія</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Шрифт</label>
+                        <select class="form-select" id="fontSelect">
+                            <option value="serif">Serif (класичний)</option>
+                            <option value="sans">Sans-serif (сучасний)</option>
+                            <option value="mono">Monospace (друкарська машинка)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Розмір шрифту: <span id="fontSizeValue">16px</span></label>
+                        <input type="range" class="form-range" id="fontSizeRange" min="12" max="24" value="16">
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Міжрядковий інтервал: <span id="lineHeightValue">1.8</span></label>
+                        <input type="range" class="form-range" id="lineHeightRange" min="1.2" max="2.5" step="0.1" value="1.8">
+                    </div>
+                </div>
+
+                <div class="settings-panel" id="writingPanel">
+                    <div class="setting-group">
+                        <label class="setting-checkbox">
+                            <input type="checkbox" id="autoSaveCheckbox" checked>
+                            <span>Автозбереження (кожні 30 секунд)</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-checkbox">
+                            <input type="checkbox" id="spellCheckCheckbox" checked>
+                            <span>Перевірка орфографії</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-checkbox">
+                            <input type="checkbox" id="typewriterModeCheckbox">
+                            <span>Режим друкарської машинки (курсор завжди по центру)</span>
+                        </label>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Денна ціль (кількість слів)</label>
+                        <input type="number" class="form-input" id="dailyGoalInput" min="100" step="100" value="1000">
+                    </div>
+                </div>
+
+                <div class="settings-panel" id="exportPanel">
+                    <div class="setting-group">
+                        <label class="setting-label">Експорт поточної глави</label>
+                        <div class="flex gap-2">
+                            <button class="btn btn-secondary" id="exportTxtBtn">
+                                <i class="fas fa-file-alt"></i> Експорт у .TXT
+                            </button>
+                            <button class="btn btn-secondary" id="exportHtmlBtn">
+                                <i class="fas fa-code"></i> Експорт у .HTML
+                            </button>
+                            <button class="btn btn-secondary" id="exportDocxBtn">
+                                <i class="fas fa-file-word"></i> Експорт у .DOCX
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="setting-group">
+                        <label class="setting-label">Експорт всієї книги</label>
+                        <button class="btn btn-primary btn-full-width" id="exportBookBtn">
+                            <i class="fas fa-book"></i> Експортувати книгу повністю
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelSettingsBtn">Скасувати</button>
+            <button class="btn btn-primary" id="saveSettingsBtn">Зберегти</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="newChapterModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📝 Нова глава</h3>
+            <button class="btn-close" id="closeNewChapterBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content" style="padding: 20px;">
+            <div class="form-group">
+                <label class="form-label">Назва глави</label>
+                <input type="text" class="form-input" id="newChapterTitle" placeholder="Глава 1: Початок">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Номер глави</label>
+                <input type="number" class="form-input" id="newChapterNumber" min="1" value="1">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Точка зору (POV) - опціонально</label>
+                <input type="text" class="form-input" id="newChapterPOV" placeholder="Наприклад: Від імені Анни">
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancelNewChapterBtn">Скасувати</button>
+            <button class="btn btn-primary" id="createNewChapterBtn">
+                <i class="fas fa-plus"></i> Створити главу
+            </button>
+        </div>
+    </div>
+</div>

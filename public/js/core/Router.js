@@ -117,31 +117,60 @@ class Router {
     }
 
     async initializeModule(route) {
+        console.log(`[Router] Початок ініціалізації модуля: ${route}`);
+
         try {
             const moduleMap = {
-                'editor': './js/modules/Editor/Editor.js',
-                'characters': './js/modules/Characters/Characters.js',
-                'terms': './js/modules/Terms/Terms.js',
-                'timeline': './js/modules/Timeline/Timeline.js'
+                'editor': '../modules/Editor/Editor.js',
+                'characters': '../modules/Characters/Characters.js',
+                'terms': '../modules/Terms/Terms.js',
+                'timeline': '../modules/Timeline/Timeline.js'
             };
 
             const modulePath = moduleMap[route];
+            console.log(`[Router] Шлях до модуля: ${modulePath}`);
+
             if (modulePath) {
-                const { default: Module } = await import(modulePath);
+                console.log(`[Router] Спроба імпорту модуля з: ${modulePath}`);
 
-                if (!this.modules.has(route)) {
-                    const moduleInstance = new Module();
-                    this.modules.set(route, moduleInstance);
+                const module = await import(modulePath);
+                console.log(`[Router] Модуль імпортовано успішно:`, module);
+
+                const ModuleClass = module.default || module.Editor || module.Characters || module.Terms || module.Timeline;
+
+                if (!ModuleClass) {
+                    console.error(`[Router] ❌ Модуль "${route}" не експортує клас`);
+                    return;
                 }
 
-                const moduleInstance = this.modules.get(route);
-                if (moduleInstance && typeof moduleInstance.init === 'function') {
-                    moduleInstance.init();
+                console.log(`[Router] Знайдено клас модуля:`, ModuleClass);
+
+                if (this.modules.has(route)) {
+                    const oldModule = this.modules.get(route);
+                    if (oldModule && typeof oldModule.destroy === 'function') {
+                        oldModule.destroy();
+                    }
                 }
+
+                console.log(`[Router] Створення інстансу модуля...`);
+                const moduleInstance = new ModuleClass();
+                this.modules.set(route, moduleInstance);
+                console.log(`[Router] Інстанс створено:`, moduleInstance);
+
+                if (typeof moduleInstance.init === 'function') {
+                    console.log(`[Router] Виклик init() модуля...`);
+                    await moduleInstance.init(this.contentArea);
+                    console.log(`✅ Модуль "${route}" ініціалізовано`);
+                } else {
+                    console.warn(`[Router] ⚠️ Модуль "${route}" не має методу init()`);
+                }
+            } else {
+                console.log(`[Router] Шлях до модуля "${route}" не знайдено в moduleMap`);
             }
 
         } catch (error) {
-            console.log(`ℹ️ Модуль "${route}" ще не реалізований`);
+            console.error(`[Router] ❌ ПОМИЛКА ініціалізації модуля "${route}":`, error);
+            console.error(`[Router] Stack trace:`, error.stack);
         }
     }
 
