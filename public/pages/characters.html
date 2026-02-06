@@ -1,0 +1,154 @@
+﻿<meta charset="UTF-8">
+<div class="characters-page" id="charactersPage">
+
+    <div class="page-header">
+        <div class="header-left">
+            <h2>🎭 Персонажі</h2>
+            <p class="page-subtitle">Управління персонажами вашої історії</p>
+        </div>
+        <div class="header-right">
+            <button class="btn primary" id="addCharacterBtn">
+                <i class="fas fa-plus"></i> Додати персонажа
+            </button>
+        </div>
+    </div>
+
+    <div class="characters-stats">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Всього персонажів</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-info">
+                <div class="stat-number" id="protagonistCount">0</div>
+                <div class="stat-label">Головних героїв</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💀</div>
+            <div class="stat-info">
+                <div class="stat-number" id="antagonistCount">0</div>
+                <div class="stat-label">Антагоністів</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-info">
+                <div class="stat-number" id="secondaryCount">0</div>
+                <div class="stat-label">Другорядних</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="characters-filters">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Всі</button>
+            <button class="filter-btn" data-filter="protagonist">⭐ Головні герої</button>
+            <button class="filter-btn" data-filter="antagonist">💀 Антагоністи</button>
+            <button class="filter-btn" data-filter="secondary">👤 Другорядні</button>
+            <button class="filter-btn" data-filter="minor">👥 Епізодичні</button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="characterSearch" placeholder="Пошук персонажів...">
+        </div>
+    </div>
+
+    <div class="characters-list" id="charactersList">
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="characterModal">
+    <div class="modal large">
+        <div class="modal-header">
+            <h3>Новий персонаж</h3>
+            <button class="btn-close" id="closeCharacterModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <form id="characterForm" class="character-form">
+                <div class="form-section">
+                    <h4 class="section-title">📋 Основна інформація</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="characterName">Ім'я персонажа *</label>
+                            <input type="text" id="characterName" class="form-input" placeholder="Введіть ім'я..." required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="characterRole">Роль</label>
+                            <select id="characterRole" class="form-select">
+                                <option value="protagonist">⭐ Головний герой</option>
+                                <option value="antagonist">💀 Антагоніст</option>
+                                <option value="secondary" selected>👤 Другорядний</option>
+                                <option value="minor">👥 Епізодичний</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="characterAge">Вік</label>
+                            <input type="text" id="characterAge" class="form-input" placeholder="Наприклад: 25 років">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="characterOccupation">Професія/Заняття</label>
+                            <input type="text" id="characterOccupation" class="form-input" placeholder="Наприклад: Детектив">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📝 Опис</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="characterDescription">Короткий опис</label>
+                        <textarea id="characterDescription" class="form-textarea" rows="3" placeholder="Короткий опис персонажа (2-3 речення)"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">👤 Зовнішність</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="characterAppearance">Опис зовнішності</label>
+                        <textarea id="characterAppearance" class="form-textarea" rows="4" placeholder="Зріст, статура, колір волосся, очей, особливі прикмети..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">💭 Характер та особистість</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="characterPersonality">Риси характеру</label>
+                        <textarea id="characterPersonality" class="form-textarea" rows="4" placeholder="Темперамент, звички, манери, особливості поведінки..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">🎯 Цілі та мотивація</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="characterGoals">Цілі персонажа</label>
+                        <textarea id="characterGoals" class="form-textarea" rows="3" placeholder="Що персонаж хоче досягти? Що ним керує?"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📖 Передісторія</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="characterBackstory">Біографія та минуле</label>
+                        <textarea id="characterBackstory" class="form-textarea" rows="5" placeholder="Звідки персонаж? Що з ним сталось до початку історії?"></textarea>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelCharacterBtn">Скасувати</button>
+            <button class="btn primary" id="saveCharacterBtn">
+                <i class="fas fa-save"></i> Зберегти
+            </button>
+        </div>
+    </div>
+</div>
