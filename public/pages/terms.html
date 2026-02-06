@@ -1,0 +1,135 @@
+﻿<meta charset="UTF-8">
+<div class="terms-page" id="termsPage">
+
+    <div class="page-header">
+        <div class="header-left">
+            <h2>📚 Терміни</h2>
+            <p class="page-subtitle">Словник термінів та понять вашої історії</p>
+        </div>
+        <div class="header-right">
+            <button class="btn primary" id="addTermBtn">
+                <i class="fas fa-plus"></i> Додати термін
+            </button>
+        </div>
+    </div>
+
+    <!-- Статистика -->
+    <div class="terms-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-info">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Всього термінів</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🗺️</div>
+            <div class="stat-info">
+                <div class="stat-number" id="placeCount">0</div>
+                <div class="stat-label">Місця</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-info">
+                <div class="stat-number" id="objectCount">0</div>
+                <div class="stat-label">Предмети</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✨</div>
+            <div class="stat-info">
+                <div class="stat-number" id="magicCount">0</div>
+                <div class="stat-label">Магія</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⚙️</div>
+            <div class="stat-info">
+                <div class="stat-number" id="technologyCount">0</div>
+                <div class="stat-label">Технологія</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📌</div>
+            <div class="stat-info">
+                <div class="stat-number" id="otherCount">0</div>
+                <div class="stat-label">Інше</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="terms-filters">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Всі</button>
+            <button class="filter-btn" data-filter="place">🗺️ Місця</button>
+            <button class="filter-btn" data-filter="object">📦 Предмети</button>
+            <button class="filter-btn" data-filter="magic">✨ Магія</button>
+            <button class="filter-btn" data-filter="technology">⚙️ Технологія</button>
+            <button class="filter-btn" data-filter="other">📌 Інше</button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="termSearch" placeholder="Пошук термінів...">
+        </div>
+    </div>
+
+    <div class="terms-list" id="termsList">
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="termModal">
+    <div class="modal medium">
+        <div class="modal-header">
+            <h3>Новий термін</h3>
+            <button class="btn-close" id="closeTermModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <form id="termForm" class="term-form">
+                <div class="form-section">
+                    <h4 class="section-title">📋 Основна інформація</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="termName">Назва терміну *</label>
+                        <input type="text" id="termName" class="form-input" placeholder="Введіть назву..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="termCategory">Категорія</label>
+                        <select id="termCategory" class="form-select">
+                            <option value="place">🗺️ Місце</option>
+                            <option value="object">📦 Предмет</option>
+                            <option value="magic">✨ Магія</option>
+                            <option value="technology">⚙️ Технологія</option>
+                            <option value="other" selected>📌 Інше</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📝 Опис</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="termDescription">Значення/Опис</label>
+                        <textarea id="termDescription" class="form-textarea" rows="4" placeholder="Що означає цей термін? Як він використовується у вашому світі?"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">💡 Контекст використання</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="termUsage">Де та як використовується</label>
+                        <textarea id="termUsage" class="form-textarea" rows="3" placeholder="У яких ситуаціях зустрічається цей термін? Приклади використання..."></textarea>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelTermBtn">Скасувати</button>
+            <button class="btn primary" id="saveTermBtn">
+                <i class="fas fa-save"></i> Зберегти
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,485 @@
+.terms-page {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Заголовок */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--primary-gold);
+}
+
+    .page-header h2 {
+        margin: 0 0 5px 0;
+        color: var(--book-brown);
+        font-size: 32px;
+    }
+
+.page-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-right {
+    display: flex;
+    gap: 10px;
+}
+
+/* Статистика */
+.terms-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.stat-card {
+    background: var(--bg-white);
+    padding: 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+    .stat-card:hover {
+        box-shadow: var(--shadow-medium);
+        transform: translateY(-2px);
+    }
+
+.stat-icon {
+    font-size: 36px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    border-radius: 50%;
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-number {
+    font-size: 32px;
+    font-weight: bold;
+    color: var(--book-brown);
+    line-height: 1;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Фільтри */
+.terms-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 10px 20px;
+    border: 2px solid var(--primary-gold);
+    background: var(--bg-white);
+    color: var(--book-brown);
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 14px;
+}
+
+    .filter-btn:hover {
+        background: var(--primary-gold);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .filter-btn.active {
+        background: var(--primary-gold);
+        color: white;
+    }
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-white);
+    padding: 10px 15px;
+    border-radius: 25px;
+    border: 2px solid #e0e0e0;
+    min-width: 300px;
+}
+
+    .search-box i {
+        color: var(--text-light);
+    }
+
+    .search-box input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: 14px;
+        background: transparent;
+    }
+
+/* Список термінів */
+.terms-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+/* Картка терміну */
+.term-card {
+    background: var(--bg-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s ease;
+    overflow: hidden;
+    border: 2px solid transparent;
+}
+
+    .term-card:hover {
+        box-shadow: var(--shadow-medium);
+        transform: translateY(-5px);
+        border-color: var(--primary-gold);
+    }
+
+.term-card-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.term-icon {
+    font-size: 40px;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.term-main-info {
+    flex: 1;
+}
+
+.term-name {
+    margin: 0 0 5px 0;
+    font-size: 20px;
+    color: var(--book-brown);
+}
+
+.term-category-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+    .term-category-badge.place {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .term-category-badge.object {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .term-category-badge.magic {
+        background: #e8d9ff;
+        color: #5a2d82;
+    }
+
+    .term-category-badge.technology {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .term-category-badge.other {
+        background: #e2e3e5;
+        color: #383d41;
+    }
+
+.term-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.term-card-body {
+    padding: 20px;
+}
+
+.term-description {
+    margin: 0 0 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.term-usage {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid var(--primary-gold);
+}
+
+    .term-usage strong {
+        color: var(--book-brown);
+    }
+
+.term-card-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #f0f0f0;
+    background: #fafafa;
+}
+
+.btn-select-term {
+    width: 100%;
+    padding: 10px;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    color: var(--book-brown);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+    .btn-select-term:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-soft);
+    }
+
+/* Порожній стан */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-light);
+}
+
+.empty-icon {
+    font-size: 72px;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state p {
+    font-size: 18px;
+}
+
+/* Форма терміну */
+.term-form {
+    padding: 20px;
+}
+
+    .term-form .form-section {
+        background: #fafafa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #e0e0e0;
+    }
+
+        .term-form .form-section:last-child {
+            margin-bottom: 0;
+        }
+
+.section-title {
+    font-size: 16px;
+    color: var(--book-brown);
+    margin: 0 0 15px 0;
+    font-weight: bold;
+}
+
+.term-form .form-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+    .term-form .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+.term-form .form-textarea,
+.term-form .form-input,
+.term-form .form-select {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.term-form .form-textarea {
+    min-height: 100px;
+    max-width: 100%;
+    resize: vertical;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    overflow-y: auto;
+    word-wrap: break-word;
+}
+
+    .term-form .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+.term-form .form-input {
+    height: 45px;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+    .term-form .form-input:focus {
+        outline: none;
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+.term-form .form-select {
+    height: 45px;
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .term-form .form-select:focus {
+        outline: none;
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+    }
+
+.term-form .form-input::placeholder,
+.term-form .form-textarea::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Модальне вікно середнього розміру */
+.modal.medium {
+    width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+    .modal.medium .modal-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0;
+    }
+
+    .modal.medium .modal-header,
+    .modal.medium .modal-footer {
+        flex-shrink: 0;
+    }
+
+/* Адаптивність */
+@media (max-width: 1200px) {
+    .terms-list {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .terms-page {
+        padding: 15px;
+    }
+
+    .terms-list {
+        grid-template-columns: 1fr;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .terms-filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .filter-buttons {
+        justify-content: center;
+    }
+
+    .search-box {
+        min-width: auto;
+    }
+
+    .terms-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .modal.medium {
+        width: 95vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .terms-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .term-card-header {
+        padding: 15px;
+    }
+}
