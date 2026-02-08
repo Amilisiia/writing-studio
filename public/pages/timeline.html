@@ -1,0 +1,151 @@
+﻿<meta charset="UTF-8">
+<div class="timeline-page" id="timelinePage">
+
+    <div class="page-header">
+        <div class="header-left">
+            <h2>⏰ Хронологія</h2>
+            <p class="page-subtitle">Тайм-лайн подій вашої історії</p>
+        </div>
+        <div class="header-right">
+            <button class="btn primary" id="addEventBtn">
+                <i class="fas fa-plus"></i> Додати подію
+            </button>
+        </div>
+    </div>
+
+    <div class="timeline-stats">
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-info">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">Всього подій</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-info">
+                <div class="stat-number" id="plotCount">0</div>
+                <div class="stat-label">Сюжетні події</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏛️</div>
+            <div class="stat-info">
+                <div class="stat-number" id="historicalCount">0</div>
+                <div class="stat-label">Історичні події</div>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">👤</div>
+            <div class="stat-info">
+                <div class="stat-number" id="personalCount">0</div>
+                <div class="stat-label">Особисті події</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="timeline-filters">
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">Всі події</button>
+            <button class="filter-btn" data-filter="plot">📖 Сюжетні</button>
+            <button class="filter-btn" data-filter="historical">🏛️ Історичні</button>
+            <button class="filter-btn" data-filter="personal">👤 Особисті</button>
+        </div>
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="eventSearch" placeholder="Пошук подій...">
+        </div>
+    </div>
+
+    <div class="timeline-container">
+        <div class="timeline-list" id="timelineList">
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="eventModal">
+    <div class="modal medium">
+        <div class="modal-header">
+            <h3>Нова подія</h3>
+            <button class="btn-close" id="closeEventModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <form id="eventForm" class="event-form">
+                <div class="form-section">
+                    <h4 class="section-title">📋 Основна інформація</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="eventTitle">Назва події *</label>
+                        <input type="text" id="eventTitle" class="form-input" placeholder="Введіть назву події..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="eventType">Тип події</label>
+                        <select id="eventType" class="form-select">
+                            <option value="plot" selected>📖 Сюжетна подія</option>
+                            <option value="historical">🏛️ Історична подія</option>
+                            <option value="personal">👤 Особиста подія</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📅 Дата події</h4>
+                    <p class="form-hint">Ви можете залишити поля порожніми, якщо точна дата невідома</p>
+                    <div class="date-fields">
+                        <div class="form-group">
+                            <label class="form-label" for="eventDateDay">День</label>
+                            <input type="number" id="eventDateDay" class="form-input" placeholder="1-31" min="1" max="31">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="eventDateMonth">Місяць</label>
+                            <select id="eventDateMonth" class="form-select">
+                                <option value="">Не вказано</option>
+                                <option value="01">01</option>
+                                <option value="02">02</option>
+                                <option value="03">03</option>
+                                <option value="04">04</option>
+                                <option value="05">05</option>
+                                <option value="06">06</option>
+                                <option value="07">07</option>
+                                <option value="08">08</option>
+                                <option value="09">09</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="eventDateYear">Рік</label>
+                            <input type="text" id="eventDateYear" class="form-input" placeholder="Наприклад: 2024 або 'Рік дракона'">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📝 Опис події</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="eventDescription">Що сталося?</label>
+                        <textarea id="eventDescription" class="form-textarea" rows="5" placeholder="Опишіть подію детально..."></textarea>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📍 Додаткова інформація</h4>
+                    <div class="form-group">
+                        <label class="form-label" for="eventLocation">Місце події</label>
+                        <input type="text" id="eventLocation" class="form-input" placeholder="Де це сталося?">
+                    </div>
+                </div>
+
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelEventBtn">Скасувати</button>
+            <button class="btn primary" id="saveEventBtn">
+                <i class="fas fa-save"></i> Зберегти
+            </button>
+        </div>
+    </div>
+</div>
