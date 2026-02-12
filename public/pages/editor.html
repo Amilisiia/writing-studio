@@ -2,23 +2,10 @@
 <div class="editor-page" id="editorPage">
     <div class="editor-toolbar">
         <div class="toolbar-left">
-            <div class="book-selector" style="display: none;">
+            <div class="book-info">
                 <i class="fas fa-book"></i>
-                <select class="form-select compact" id="bookSelect">
-                    <option value="">Оберіть книгу...</option>
-                </select>
+                <span id="currentBookTitle">Оберіть книгу...</span>
             </div>
-
-            <div class="chapter-selector">
-                <i class="fas fa-file-alt"></i>
-                <select class="form-select compact" id="chapterSelect">
-                    <option value="">Оберіть главу...</option>
-                </select>
-            </div>
-
-            <button class="btn-icon" id="newChapterBtn" title="Нова глава">
-                <i class="fas fa-plus"></i>
-            </button>
         </div>
 
         <div class="toolbar-center">
@@ -63,23 +50,15 @@
             </div>
 
             <div class="sidebar-section">
-                <h4><i class="fas fa-tools"></i> Інструменти</h4>
+                <h4><i class="fas fa-link"></i> Швидкий доступ</h4>
                 <div class="quick-tools">
-                    <button class="tool-btn" id="insertCharacterBtn" title="Вставити персонажа">
-                        <i class="fas fa-user"></i>
-                        <span>Персонаж</span>
-                    </button>
-                    <button class="tool-btn" id="insertTermBtn" title="Вставити термін">
+                    <button class="tool-btn" id="insertTermBtn" title="Додати термін з словника">
                         <i class="fas fa-book-open"></i>
                         <span>Термін</span>
                     </button>
-                    <button class="tool-btn" id="insertNoteBtn" title="Нотатка автора">
-                        <i class="fas fa-sticky-note"></i>
-                        <span>Нотатка</span>
-                    </button>
-                    <button class="tool-btn" id="sceneBreakBtn" title="Розділювач сцен">
-                        <i class="fas fa-ellipsis-h"></i>
-                        <span>Розділювач</span>
+                    <button class="tool-btn" id="insertTimelineBtn" title="Додати подію з хронології">
+                        <i class="fas fa-clock"></i>
+                        <span>Хронологія</span>
                     </button>
                 </div>
             </div>
@@ -134,7 +113,7 @@
                     <div class="metadata-item">
                         <label>Персонажі</label>
                         <div class="characters-tags" id="chapterCharacters">
-                            <button class="add-character-tag" id="addCharacterTagBtn">
+                            <button class="add-character-tag" id="addCharacterBtn">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>

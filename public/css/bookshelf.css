@@ -254,3 +254,41 @@
 .bookshelf::-webkit-scrollbar-thumb:hover {
     background: var(--secondary-gold);
 }
+
+/* Кнопка видалення книги */
+.book-delete-btn {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 14px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.book-item:hover .book-delete-btn {
+    display: flex;
+}
+
+.book-delete-btn:hover {
+    background: #c82333;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.book-delete-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.book-item {
+    position: relative;
+}

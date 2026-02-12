@@ -47,7 +47,15 @@ export class Editor {
 
             this.initEventHandlers();
 
-            await this.loadBooks();
+            const savedBookId = localStorage.getItem('currentBookId');
+            if (savedBookId) {
+                await this.selectBook(savedBookId);
+
+                const savedChapterId = localStorage.getItem('currentChapterId');
+                if (savedChapterId) {
+                    await this.onChapterSelected(savedChapterId);
+                }
+            }
 
             this.applySettings();
 
@@ -63,8 +71,7 @@ export class Editor {
 
     initElements() {
         this.elements = {
-            bookSelect: document.getElementById('bookSelect'),
-            chapterSelect: document.getElementById('chapterSelect'),
+            currentBookTitle: document.getElementById('currentBookTitle'),
             textEditor: document.getElementById('textEditor'),
             chapterTitle: document.getElementById('chapterTitle'),
 
@@ -97,17 +104,7 @@ export class Editor {
     }
 
     initEventHandlers() {
-        this.elements.bookSelect.addEventListener('change', (e) => {
-            this.onBookSelected(e.target.value);
-        });
 
-        this.elements.chapterSelect.addEventListener('change', (e) => {
-            this.onChapterSelected(e.target.value);
-        });
-
-        document.getElementById('newChapterBtn').addEventListener('click', () => {
-            this.showNewChapterModal();
-        });
         document.getElementById('addChapterBtn').addEventListener('click', () => {
             this.showNewChapterModal();
         });
@@ -155,7 +152,7 @@ export class Editor {
             this.toggleFullscreen();
         });
 
-        document.getElementById('insertCharacterBtn').addEventListener('click', () => {
+        document.getElementById('addCharacterBtn').addEventListener('click', () => {
             this.requestCharacter();
         });
 
@@ -163,12 +160,8 @@ export class Editor {
             this.requestTerm();
         });
 
-        document.getElementById('insertNoteBtn').addEventListener('click', () => {
-            this.insertAuthorNote();
-        });
-
-        document.getElementById('sceneBreakBtn').addEventListener('click', () => {
-            this.insertSceneBreak();
+        document.getElementById('insertTimelineBtn').addEventListener('click', () => {
+            this.requestTimelineEvent();
         });
 
         this.initNewChapterModal();
@@ -293,39 +286,35 @@ export class Editor {
             console.log('[Editor] Отримано подію term:selected:', term);
             this.insertTermName(term.name);
         });
-    }
 
-    async loadBooks() {
-        try {
-            const result = await bookService.getAllBooks();
-            const books = result.success ? result.data : [];
-
-            this.elements.bookSelect.innerHTML = '<option value="">Оберіть книгу...</option>';
-
-            books.forEach(book => {
-                const option = document.createElement('option');
-                option.value = book.id;
-                option.textContent = book.title;
-                this.elements.bookSelect.appendChild(option);
-            });
-
-            console.log('[Editor] Завантажено', books.length, 'книг');
-        } catch (error) {
-            console.error('[Editor] Помилка завантаження книг:', error);
-        }
+        eventBus.on('timeline:selected', (event) => {
+            console.log('[Editor] Отримано подію timeline:selected:', event);
+            this.insertTimelineReference(event);
+        });
     }
 
     async selectBook(bookId) {
         if (!bookId) return;
+
+        if (this.currentBook && this.currentBook.id !== bookId) {
+            this.currentChapter = null;
+            this.elements.textEditor.innerHTML = '<p>Оберіть главу для редагування</p>';
+            this.elements.chapterTitle.value = '';
+            this.elements.chapterNumber.value = 1;
+            this.elements.chapterPOV.value = '';
+            localStorage.removeItem('currentChapterId');
+        }
 
         try {
             const result = await bookService.getBook(bookId);
             if (result.success) {
                 this.currentBook = result.data;
 
-                this.elements.bookSelect.value = bookId;
+                this.elements.currentBookTitle.textContent = this.currentBook.title;
 
                 await this.loadChapters();
+
+                localStorage.setItem('currentBookId', this.currentBook.id);
 
                 console.log('[Editor] Вибрано книгу:', this.currentBook.title);
             }
@@ -345,15 +334,6 @@ export class Editor {
             const chapters = await chapterService.getAll(this.currentBook.id);
 
             chapters.sort((a, b) => (a.order || 0) - (b.order || 0));
-
-            this.elements.chapterSelect.innerHTML = '<option value="">Оберіть главу...</option>';
-
-            chapters.forEach(chapter => {
-                const option = document.createElement('option');
-                option.value = chapter.id;
-                option.textContent = chapter.title || `Глава ${chapter.order || '?'}`;
-                this.elements.chapterSelect.appendChild(option);
-            });
 
             this.updateChaptersOutline(chapters);
 
@@ -412,8 +392,6 @@ export class Editor {
 
             this.currentChapter = await chapterService.get(this.currentBook.id, chapterId);
 
-            this.elements.chapterSelect.value = chapterId;
-
             this.loadChapterIntoEditor();
 
             document.querySelectorAll('.outline-item').forEach(item => {
@@ -422,6 +400,8 @@ export class Editor {
                     item.classList.add('active');
                 }
             });
+
+            localStorage.setItem('currentChapterId', this.currentChapter.id);
 
             console.log('[Editor] Вибрано главу:', this.currentChapter.title);
         } catch (error) {
@@ -448,7 +428,9 @@ export class Editor {
             return;
         }
 
-        const nextNumber = this.elements.chapterSelect.options.length;
+        const chapters = this.elements.chaptersOutline.querySelectorAll('.outline-item');
+        const nextNumber = chapters.length + 1;
+
         document.getElementById('newChapterNumber').value = nextNumber;
         document.getElementById('newChapterTitle').value = '';
         document.getElementById('newChapterPOV').value = '';
@@ -487,6 +469,12 @@ export class Editor {
 
             await this.onChapterSelected(newChapter.id);
 
+            eventBus.emit('chapter:created', { bookId: this.currentBook.id });
+
+            await bookService.updateBook(this.currentBook.id, {
+                updatedAt: new Date().toISOString()
+            });
+
             this.hideNewChapterModal();
 
             this.showToast('Главу створено успішно!', 'success');
@@ -508,9 +496,16 @@ export class Editor {
                 this.currentChapter = null;
                 this.elements.textEditor.innerHTML = '<p>Оберіть главу для редагування</p>';
                 this.elements.chapterTitle.value = '';
+                localStorage.removeItem('currentChapterId');
             }
 
             await this.loadChapters();
+
+            eventBus.emit('chapter:deleted', { bookId: this.currentBook.id });
+
+            await bookService.updateBook(this.currentBook.id, {
+                updatedAt: new Date().toISOString()
+            });
 
             this.showToast('Главу видалено', 'success');
         } catch (error) {
@@ -593,6 +588,10 @@ export class Editor {
 
             await this.loadChapters();
 
+            await bookService.updateBook(this.currentBook.id, {
+                updatedAt: new Date().toISOString()
+            });
+
             console.log('[Editor] Главу збережено');
         } catch (error) {
             console.error('[Editor] Помилка збереження:', error);
@@ -632,22 +631,17 @@ export class Editor {
         this.execCommand('formatBlock', 'blockquote');
     }
 
-    insertSceneBreak() {
-        const sceneBreak = '<hr class="scene-break">';
-        this.execCommand('insertHTML', sceneBreak);
-    }
-
-    insertAuthorNote() {
-        const note = '<div class="author-note">Напишіть вашу нотатку тут...</div><p></p>';
-        this.execCommand('insertHTML', note);
-    }
-
     requestCharacter() {
         eventBus.emit('editor:request-character');
     }
 
     requestTerm() {
         eventBus.emit('editor:request-term');
+    }
+
+    requestTimelineEvent() {
+        console.log('[Editor] Запит події з хронології');
+        eventBus.emit('editor:request-timeline');
     }
 
     insertCharacterName(name) {
@@ -658,6 +652,15 @@ export class Editor {
     insertTermName(name) {
         const span = `<span class="term-mention">${name}</span>&nbsp;`;
         this.execCommand('insertHTML', span);
+    }
+
+    insertTimelineReference(event) {
+        const formattedDate = event.dateDay || event.dateMonth || event.dateYear
+            ? `${event.dateDay || ''} ${event.dateMonth || ''} ${event.dateYear || ''}`.trim()
+            : 'Дата невідома';
+
+        const reference = `<span class="timeline-mention" title="${formattedDate}">${event.title}</span>&nbsp;`;
+        this.execCommand('insertHTML', reference);
     }
 
     toggleSidebar() {

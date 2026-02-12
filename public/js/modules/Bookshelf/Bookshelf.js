@@ -58,6 +58,16 @@ class Bookshelf {
         eventBus.on('book:created', () => this.loadBooks());
         eventBus.on('book:updated', () => this.loadBooks());
         eventBus.on('book:deleted', () => this.loadBooks());
+
+        eventBus.on('chapter:created', () => {
+            console.log('[Bookshelf] Отримано подію chapter:created');
+            this.loadBooks();
+        });
+
+        eventBus.on('chapter:deleted', () => {
+            console.log('[Bookshelf] Отримано подію chapter:deleted');
+            this.loadBooks();
+        });
     }
 
     async loadBooks() {
@@ -110,22 +120,53 @@ class Bookshelf {
             book.chaptersCount < 5 ? 'глави' : 'глав';
 
         bookDiv.innerHTML = `
-            <div class="book-spine">
-                <strong>${book.title}</strong>
-                <div class="book-meta">${book.chaptersCount || 0} ${chaptersText} • ${timeAgo}</div>
-            </div>
-        `;
+    <div class="book-spine">
+        <strong>${book.title}</strong>
+        <div class="book-meta">${book.chaptersCount || 0} ${chaptersText} • Змінено ${timeAgo}</div>
+    </div>
+    <button class="book-delete-btn" data-book-id="${book.id}" title="Видалити книгу">
+        <i class="fas fa-trash"></i>
+    </button>
+    `;
 
         bookDiv.addEventListener('click', () => this.selectBook(book));
+
+        const deleteBtn = bookDiv.querySelector('.book-delete-btn');
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.deleteBook(book);
+        });
 
         return bookDiv;
     }
 
-    getTimeAgo(dateString) {
+    getTimeAgo(dateValue) {
+        if (!dateValue) {
+            return 'Нещодавно';
+        }
+
         const now = new Date();
-        const date = new Date(dateString);
+        let date;
+
+        if (dateValue.toDate && typeof dateValue.toDate === 'function') {
+            date = dateValue.toDate();
+        } else if (dateValue.seconds) {
+            date = new Date(dateValue.seconds * 1000);
+        } else {
+            date = new Date(dateValue);
+        }
+
+        console.log('[getTimeAgo] Input:', dateValue);
+        console.log('[getTimeAgo] Parsed date:', date);
+
+        if (isNaN(date.getTime())) {
+            return 'Нещодавно';
+        }
+
         const diffTime = Math.abs(now - date);
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        console.log('[getTimeAgo] Diff days:', diffDays);
 
         if (diffDays === 0) return 'Сьогодні';
         if (diffDays === 1) return 'Вчора';
@@ -169,6 +210,27 @@ class Bookshelf {
         } catch (error) {
             console.error('❌ Помилка створення книги:', error);
             this.showToast('Помилка створення книги', 'error');
+        }
+    }
+
+    async deleteBook(book) {
+        const confirmed = confirm(`Ви впевнені, що хочете видалити книгу "${book.title}"?\n\nЦя дія також видалить всі глави цієї книги!`);
+
+        if (!confirmed) return;
+
+        try {
+            const result = await bookService.deleteBook(book.id);
+
+            if (result.success) {
+                this.showToast(`Книгу "${book.title}" видалено`, 'success');
+                await this.loadBooks();
+            } else {
+                this.showToast('Помилка видалення книги', 'error');
+            }
+
+        } catch (error) {
+            console.error('❌ Помилка видалення книги:', error);
+            this.showToast('Помилка видалення книги', 'error');
         }
     }
 

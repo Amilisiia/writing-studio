@@ -42,7 +42,11 @@ class StorageService {
 
     async create(collectionName, docId, data) {
         try {
+            console.log('[StorageService] create викликано з:', { collectionName, docId });
+
             const docRef = this.getUserDoc(collectionName, docId);
+
+            console.log('[StorageService] docRef створено');
 
             const dataWithTimestamp = {
                 ...data,
@@ -57,6 +61,7 @@ class StorageService {
 
         } catch (error) {
             console.error('❌ Помилка створення документа:', error);
+            console.error('❌ Параметри:', { collectionName, docId });
             return { success: false, error: error.message };
         }
     }

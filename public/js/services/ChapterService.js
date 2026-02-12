@@ -8,7 +8,14 @@ class ChapterServiceClass {
 
     async getAll(bookId) {
         try {
-            const chapters = await storageService.getAll(`books/${bookId}/${this.collectionName}`);
+            const result = await storageService.readAll(this.collectionName);
+
+            if (!result.success) {
+                return [];
+            }
+
+            const chapters = result.data.filter(chapter => chapter.bookId === bookId);
+
             console.log(`[ChapterService] Завантажено ${chapters.length} глав для книги ${bookId}`);
             return chapters;
         } catch (error) {
@@ -19,7 +26,11 @@ class ChapterServiceClass {
 
     async get(bookId, chapterId) {
         try {
-            const chapter = await storageService.get(`books/${bookId}/${this.collectionName}`, chapterId);
+            const result = await storageService.read(this.collectionName, chapterId);
+            if (!result.success) {
+                throw new Error('Chapter not found');
+            }
+            const chapter = result.data;
             console.log('[ChapterService] Завантажено главу:', chapter.title);
             return chapter;
         } catch (error) {
@@ -30,7 +41,10 @@ class ChapterServiceClass {
 
     async create(bookId, chapterData) {
         try {
+            const chapterId = 'chapter_' + Date.now();
+
             const data = {
+                bookId: bookId,
                 title: chapterData.title || 'Нова глава',
                 content: chapterData.content || '<p></p>',
                 order: chapterData.order || 1,
@@ -41,7 +55,13 @@ class ChapterServiceClass {
                 updatedAt: new Date()
             };
 
-            const chapter = await storageService.create(`books/${bookId}/${this.collectionName}`, data);
+            const result = await storageService.create(this.collectionName, chapterId, data);
+
+            if (!result.success) {
+                throw new Error('Failed to create chapter');
+            }
+
+            const chapter = { id: chapterId, ...data };
 
             console.log('[ChapterService] Створено главу:', chapter);
 
@@ -61,13 +81,17 @@ class ChapterServiceClass {
                 updatedAt: new Date()
             };
 
-            const chapter = await storageService.update(`books/${bookId}/${this.collectionName}`, chapterId, data);
+            const result = await storageService.update(this.collectionName, chapterId, data);
+
+            if (!result.success) {
+                throw new Error('Failed to update chapter');
+            }
 
             console.log('[ChapterService] Оновлено главу:', chapterId);
 
-            eventBus.emit('chapter:updated', chapter);
+            eventBus.emit('chapter:updated', { id: chapterId, ...data });
 
-            return chapter;
+            return { id: chapterId, ...data };
         } catch (error) {
             console.error('[ChapterService] Помилка оновлення глави:', error);
             throw error;
@@ -76,7 +100,7 @@ class ChapterServiceClass {
 
     async delete(bookId, chapterId) {
         try {
-            await storageService.delete(`books/${bookId}/${this.collectionName}`, chapterId);
+            await storageService.delete(this.collectionName, chapterId);
 
             console.log('[ChapterService] Видалено главу:', chapterId);
 

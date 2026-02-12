@@ -1,5 +1,6 @@
 ﻿import storageService from './StorageService.js';
 import eventBus from '../core/EventBus.js';
+import chapterService from './ChapterService.js';
 
 class BookService {
     constructor() {
@@ -17,7 +18,7 @@ class BookService {
                 description: bookData.description || '',
                 author: bookData.author || '',
                 genre: bookData.genre || '',
-                status: 'draft', // draft, in-progress, completed
+                status: 'draft',
                 chaptersCount: 0,
                 wordsCount: 0,
                 createdAt: new Date().toISOString(),
@@ -45,8 +46,22 @@ class BookService {
             const result = await storageService.readAll(this.collectionName);
 
             if (result.success) {
-                console.log(`📚 Завантажено ${result.data.length} книг`);
-                return result;
+                const books = result.data;
+
+                const chaptersResult = await storageService.readAll('chapters');
+                const allChapters = chaptersResult.success ? chaptersResult.data : [];
+
+                const booksWithStats = books.map(book => {
+                    const bookChapters = allChapters.filter(chapter => chapter.bookId === book.id);
+                    return {
+                        ...book,
+                        chaptersCount: bookChapters.length,
+                        wordsCount: bookChapters.reduce((sum, ch) => sum + (ch.wordCount || 0), 0)
+                    };
+                });
+
+                console.log(`📚 Завантажено ${booksWithStats.length} книг`);
+                return { success: true, data: booksWithStats };
             } else {
                 return result;
             }
@@ -105,6 +120,16 @@ class BookService {
 
     async deleteBook(bookId) {
         try {
+            const chaptersResult = await storageService.readAll('chapters');
+            if (chaptersResult.success) {
+                const bookChapters = chaptersResult.data.filter(ch => ch.bookId === bookId);
+
+                for (const chapter of bookChapters) {
+                    await storageService.delete('chapters', chapter.id);
+                    console.log('🗑️ Видалено главу:', chapter.id);
+                }
+            }
+
             const result = await storageService.delete(this.collectionName, bookId);
 
             if (result.success) {
