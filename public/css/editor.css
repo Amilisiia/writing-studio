@@ -1,9 +1,3 @@
-/* Повні стилі редактора - advanced-editor.css */
-
-/* ==========================================
-   ОСНОВНА СТРУКТУРА РЕДАКТОРА
-   ========================================== */
-
 .editor-page {
     display: flex;
     flex-direction: column;
@@ -86,10 +80,6 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
-/* ==========================================
-   ОСНОВНА ОБЛАСТЬ РЕДАГУВАННЯ
-   ========================================== */
 
 .editor-main-area {
     display: flex;
@@ -308,10 +298,6 @@
     font-size: 11px;
 }
 
-/* ==========================================
-   ОБЛАСТЬ КОНТЕНТУ
-   ========================================== */
-
 .editor-content-area {
     flex: 1;
     display: flex;
@@ -426,10 +412,6 @@
     background: var(--primary-gold);
     color: white;
 }
-
-/* ==========================================
-   ТЕКСТОВИЙ РЕДАКТОР
-   ========================================== */
 
 .text-editor-container {
     flex: 1;
@@ -626,10 +608,6 @@
     font-style: normal;
 }
 
-/* ==========================================
-   СТАТУСНА ПАНЕЛЬ
-   ========================================== */
-
 .editor-status-bar {
     display: flex;
     align-items: center;
@@ -729,10 +707,6 @@
     padding-top: 50vh;
     padding-bottom: 50vh;
 }
-
-/* ==========================================
-   МОДАЛЬНЕ ВІКНО НАЛАШТУВАНЬ
-   ========================================== */
 
 .modal-overlay {
     position: fixed;
@@ -892,10 +866,6 @@
     background: #fafafa;
 }
 
-/* ==========================================
-   ТЕМИ
-   ========================================== */
-
 /* Темна тема */
 body.theme-dark {
     --bg-main: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
@@ -925,9 +895,7 @@ body.theme-sepia {
     --text-light: #a1887f;
 }
 
-/* ==========================================
-   АДАПТИВНІСТЬ
-   ========================================== */
+/* АДАПТИВНІСТЬ */
 
 @media (max-width: 1024px) {
     .editor-sidebar {
@@ -1014,9 +982,7 @@ body.theme-sepia {
     }
 }
 
-/* ==========================================
-   УТИЛІТИ
-   ========================================== */
+/* УТИЛІТИ */
 
 .btn-icon {
     background: none;
@@ -1076,3 +1042,592 @@ body.theme-sepia {
         color: var(--primary-gold);
         font-size: 18px;
     }
+
+    /* ІНТЕГРАЦІЙНІ ЕЛЕМЕНТИ */
+
+.metadata-item.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Контейнер зв'язаних елементів */
+.linked-items-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    min-height: 40px;
+    padding: 8px;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.linked-items-container:empty::before {
+    content: "Персонажі не додані";
+    color: #999;
+    font-size: 14px;
+    font-style: italic;
+}
+
+/* Картка зв'язаного елемента */
+.linked-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    color: var(--book-brown);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.linked-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.linked-item i {
+    font-size: 12px;
+}
+
+.linked-item span {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Кнопка видалення з картки */
+.remove-link {
+    background: rgba(0, 0, 0, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    color: white;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 4px;
+    transition: all 0.3s ease;
+}
+
+.remove-link:hover {
+    background: #dc3545;
+    transform: scale(1.1);
+}
+
+/* Кнопка додавання */
+.btn-add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: white;
+    border: 2px solid var(--primary-gold);
+    color: var(--book-brown);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-add-link:hover {
+    background: var(--primary-gold);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.btn-add-link i {
+    font-size: 12px;
+}
+
+/* Модальне вікно інфо про персонажа */
+.character-info-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-strong);
+    width: 400px;
+    max-width: 90vw;
+    z-index: 10001;
+    display: none;
+}
+
+.character-info-modal.active {
+    display: block;
+}
+
+/* Модальне вікно інфо про персонажа */
+.info-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+    .info-modal-overlay.active {
+        display: flex;
+    }
+
+.character-info-modal {
+    background: var(--bg-white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-strong);
+    width: 500px;
+    max-width: 90vw;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.info-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    color: var(--book-brown);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    position: relative;
+}
+
+    .info-header i.fa-user {
+        font-size: 24px;
+    }
+
+    .info-header h3 {
+        margin: 0;
+        font-size: 20px;
+        flex: 1;
+    }
+
+    .info-header .btn-close {
+        position: absolute;
+        right: 15px;
+        top: 15px;
+        background: rgba(0, 0, 0, 0.1);
+        border: none;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        color: var(--book-brown);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .info-header .btn-close:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: rotate(90deg);
+        }
+
+.info-body {
+    padding: 25px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.info-row {
+    margin-bottom: 20px;
+}
+
+    .info-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .info-row label {
+        display: block;
+        font-weight: bold;
+        color: var(--book-brown);
+        margin-bottom: 8px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-row p {
+        margin: 0;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        font-size: 14px;
+    }
+
+    .info-row .badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+        .info-row .badge.protagonist {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .info-row .badge.antagonist {
+            background: #f44336;
+            color: white;
+        }
+
+        .info-row .badge.secondary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .info-row .badge.minor {
+            background: #9E9E9E;
+            color: white;
+        }
+
+.info-footer {
+    padding: 15px 20px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    background: #fafafa;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.search-section {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.select-characters-list {
+    padding: 20px;
+    max-height: 500px;
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+.select-character-card {
+    background: var(--bg-white);
+    border: 2px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .select-character-card:hover {
+        border-color: var(--primary-gold);
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-medium);
+    }
+
+.select-character-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.select-character-icon {
+    font-size: 32px;
+}
+
+.select-character-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--book-brown);
+    margin: 0;
+}
+
+.select-character-role {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 5px;
+}
+
+    .select-character-role.protagonist {
+        background: #4CAF50;
+        color: white;
+    }
+
+    .select-character-role.antagonist {
+        background: #f44336;
+        color: white;
+    }
+
+    .select-character-role.secondary {
+        background: #2196F3;
+        color: white;
+    }
+
+    .select-character-role.minor {
+        background: #9E9E9E;
+        color: white;
+    }
+
+.select-character-meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 5px 0 0 0;
+}
+
+.select-characters-list:empty::before {
+    content: "Персонажів не знайдено";
+    display: block;
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-style: italic;
+}
+
+/*  ШВИДКИЙ ДОСТУП - ТЕРМІНИ ТА ХРОНОЛОГІЯ  */
+
+.quick-access-block {
+    margin-bottom: 20px;
+}
+
+.quick-access-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.quick-access-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(212, 175, 55, 0.1);
+    border-left: 3px solid var(--primary-gold);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 13px;
+}
+
+    .quick-access-item:hover {
+        background: rgba(212, 175, 55, 0.2);
+        transform: translateX(3px);
+    }
+
+    .quick-access-item i {
+        color: var(--primary-gold);
+        font-size: 14px;
+    }
+
+    .quick-access-item span {
+        flex: 1;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .quick-access-item .remove-quick {
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+        font-size: 16px;
+        padding: 0;
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: all 0.3s ease;
+    }
+
+        .quick-access-item .remove-quick:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+.quick-access-list:empty::before {
+    content: "Немає доданих елементів";
+    display: block;
+    text-align: center;
+    padding: 15px;
+    color: #999;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* Скролбар для списків */
+.quick-access-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.quick-access-list::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 2px;
+}
+
+.quick-access-list::-webkit-scrollbar-thumb {
+    background: var(--primary-gold);
+    border-radius: 2px;
+}
+
+/* TOAST */
+
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+}
+
+#toastContainer {
+    pointer-events: none;
+}
+
+    #toastContainer > * {
+        pointer-events: auto;
+    }
+
+/* ВІКНО ПІДТВЕРДЖЕННЯ */
+
+.confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+}
+
+    .confirm-overlay.active {
+        display: flex;
+    }
+
+.confirm-modal {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: slideDown 0.3s ease;
+}
+
+.confirm-icon {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 20px;
+    background: linear-gradient(135deg, #ffc107, #ff9800);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+}
+
+.confirm-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: var(--book-brown);
+    margin-bottom: 15px;
+    font-family: var(--font-serif);
+}
+
+.confirm-message {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+    .confirm-buttons .btn {
+        min-width: 120px;
+        padding: 12px 24px;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

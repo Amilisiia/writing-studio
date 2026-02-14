@@ -241,11 +241,6 @@ export class Terms {
                 ${term.description ? `<p class="term-description">${term.description}</p>` : ''}
                 ${term.usage ? `<p class="term-usage"><strong>Контекст:</strong> ${term.usage}</p>` : ''}
             </div>
-            <div class="term-card-footer">
-                <button class="btn-select-term" data-id="${term.id}">
-                    Вибрати для редактора
-                </button>
-            </div>
         `;
 
         card.querySelector('.edit-term').addEventListener('click', (e) => {
@@ -256,11 +251,6 @@ export class Terms {
         card.querySelector('.delete-term').addEventListener('click', (e) => {
             e.stopPropagation();
             this.deleteTerm(term.id);
-        });
-
-        card.querySelector('.btn-select-term').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.selectTermForEditor(term);
         });
 
         return card;
@@ -371,13 +361,6 @@ export class Terms {
             console.error('[Terms] Помилка видалення терміну:', error);
             alert('Помилка видалення терміну');
         }
-    }
-
-    selectTermForEditor(term) {
-        console.log('[Terms] Відправка терміну в редактор:', term.name);
-        eventBus.emit('term:selected', term);
-
-        alert(`Термін "${term.name}" відправлено в редактор!`);
     }
 
     destroy() {

@@ -51,15 +51,20 @@
 
             <div class="sidebar-section">
                 <h4><i class="fas fa-link"></i> Швидкий доступ</h4>
-                <div class="quick-tools">
-                    <button class="tool-btn" id="insertTermBtn" title="Додати термін з словника">
-                        <i class="fas fa-book-open"></i>
-                        <span>Термін</span>
+                <div class="quick-access-block">
+                    <button class="btn btn-secondary btn-small btn-full-width" id="addLinkedTermBtn">
+                        <i class="fas fa-book-open"></i> Термін
                     </button>
-                    <button class="tool-btn" id="insertTimelineBtn" title="Додати подію з хронології">
-                        <i class="fas fa-clock"></i>
-                        <span>Хронологія</span>
+                    <div class="quick-access-list" id="linkedTermsList">
+                    </div>
+                </div>
+
+                <div class="quick-access-block">
+                    <button class="btn btn-secondary btn-small btn-full-width" id="addLinkedTimelineBtn">
+                        <i class="fas fa-clock"></i> Хронологія
                     </button>
+                    <div class="quick-access-list" id="linkedTimelinesList">
+                    </div>
                 </div>
             </div>
 
@@ -110,13 +115,13 @@
                         <input type="text" class="form-input small" id="chapterPOV" placeholder="Від імені кого...">
                     </div>
 
-                    <div class="metadata-item">
-                        <label>Персонажі</label>
-                        <div class="characters-tags" id="chapterCharacters">
-                            <button class="add-character-tag" id="addCharacterBtn">
-                                <i class="fas fa-plus"></i>
-                            </button>
+                    <div class="metadata-item full-width">
+                        <label>Персонажі глави</label>
+                        <div class="linked-items-container" id="chapterCharactersContainer">
                         </div>
+                        <button class="btn-add-link" id="addCharacterBtn" title="Додати персонажа">
+                            <i class="fas fa-plus"></i> Додати персонажа
+                        </button>
                     </div>
                 </div>
             </div>
@@ -223,6 +228,148 @@
             <div class="status-item">
                 <i class="fas fa-clock"></i>
                 <span id="lastSaved">Ніколи</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="selectCharacterModal">
+        <div class="modal large">
+            <div class="modal-header">
+                <h3>📚 Оберіть персонажа</h3>
+                <button class="btn-close" id="closeSelectCharacterModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-content">
+                <div class="search-section">
+                    <input type="text"
+                           class="form-input"
+                           id="selectCharacterSearch"
+                           placeholder="🔍 Пошук персонажів...">
+                </div>
+
+                <div class="select-characters-list" id="selectCharactersList">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelSelectCharacterBtn">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-modal-overlay" id="characterInfoOverlay">
+        <div class="character-info-modal" id="characterInfoModal">
+            <div class="info-header">
+                <i class="fas fa-user"></i>
+                <h3 id="characterInfoName">Ім'я персонажа</h3>
+                <button class="btn-close" id="closeCharacterInfoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="info-body" id="characterInfoBody">
+            </div>
+
+            <div class="info-footer">
+                <!-- TODO: Додати кнопку "Редагувати"-->
+                <!-- <button class="btn btn-secondary" id="editCharacterBtn">
+                    <i class="fas fa-edit"></i> Редагувати
+                </button> -->
+                <button class="btn btn-primary" id="closeCharacterInfoBtn">Закрити</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="selectTermModal">
+        <div class="modal large">
+            <div class="modal-header">
+                <h3>📖 Оберіть термін</h3>
+                <button class="btn-close" id="closeSelectTermModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-content">
+                <div class="search-section">
+                    <input type="text"
+                           class="form-input"
+                           id="selectTermSearch"
+                           placeholder="🔍 Пошук термінів...">
+                </div>
+
+                <div class="select-characters-list" id="selectTermsList">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelSelectTermBtn">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-modal-overlay" id="termInfoOverlay">
+        <div class="character-info-modal" id="termInfoModal">
+            <div class="info-header">
+                <i class="fas fa-book-open"></i>
+                <h3 id="termInfoName">Назва терміну</h3>
+                <button class="btn-close" id="closeTermInfoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="info-body" id="termInfoBody">
+            </div>
+
+            <div class="info-footer">
+                <button class="btn btn-primary" id="closeTermInfoBtn">Закрити</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="selectTimelineModal">
+        <div class="modal large">
+            <div class="modal-header">
+                <h3>🕐 Оберіть подію</h3>
+                <button class="btn-close" id="closeSelectTimelineModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="modal-content">
+                <div class="search-section">
+                    <input type="text"
+                           class="form-input"
+                           id="selectTimelineSearch"
+                           placeholder="🔍 Пошук подій...">
+                </div>
+
+                <div class="select-characters-list" id="selectTimelineList">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelSelectTimelineBtn">Скасувати</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="info-modal-overlay" id="timelineInfoOverlay">
+        <div class="character-info-modal" id="timelineInfoModal">
+            <div class="info-header">
+                <i class="fas fa-clock"></i>
+                <h3 id="timelineInfoTitle">Назва події</h3>
+                <button class="btn-close" id="closeTimelineInfoModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="info-body" id="timelineInfoBody">
+            </div>
+
+            <div class="info-footer">
+                <button class="btn btn-primary" id="closeTimelineInfoBtn">Закрити</button>
             </div>
         </div>
     </div>
@@ -370,3 +517,19 @@
         </div>
     </div>
 </div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-modal">
+        <div class="confirm-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h3 class="confirm-title" id="confirmTitle">Підтвердження</h3>
+        <p class="confirm-message" id="confirmMessage">Ви впевнені?</p>
+        <div class="confirm-buttons">
+            <button class="btn btn-secondary" id="confirmCancelBtn">Скасувати</button>
+            <button class="btn btn-danger" id="confirmOkBtn">Підтвердити</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastContainer" style="position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px;"></div>

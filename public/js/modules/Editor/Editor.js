@@ -7,6 +7,9 @@ export class Editor {
         this.container = null;
         this.currentBook = null;
         this.currentChapter = null;
+        this.linkedCharacters = [];
+        this.linkedTerms = [];
+        this.linkedTimeline = [];
         this.autoSaveInterval = null;
         this.saveTimeout = null;
         this.stats = {
@@ -57,6 +60,7 @@ export class Editor {
                 }
             }
 
+
             this.applySettings();
 
             if (this.settings.autoSave) {
@@ -77,7 +81,9 @@ export class Editor {
 
             chapterNumber: document.getElementById('chapterNumber'),
             chapterPOV: document.getElementById('chapterPOV'),
-            chapterCharacters: document.getElementById('chapterCharacters'),
+            chapterCharactersContainer: document.getElementById('chapterCharactersContainer'),
+            linkedTermsList: document.getElementById('linkedTermsList'),
+            linkedTimelinesList: document.getElementById('linkedTimelinesList'),
 
             chaptersOutline: document.getElementById('chaptersOutline'),
 
@@ -99,7 +105,16 @@ export class Editor {
             sidebar: document.getElementById('editorSidebar'),
 
             settingsModal: document.getElementById('settingsModal'),
-            newChapterModal: document.getElementById('newChapterModal')
+            newChapterModal: document.getElementById('newChapterModal'),
+            selectCharacterModal: document.getElementById('selectCharacterModal'),
+            characterInfoOverlay: document.getElementById('characterInfoOverlay'),
+            characterInfoModal: document.getElementById('characterInfoModal'),
+            selectTermModal: document.getElementById('selectTermModal'),
+            termInfoOverlay: document.getElementById('termInfoOverlay'),
+            termInfoModal: document.getElementById('termInfoModal'),
+            selectTimelineModal: document.getElementById('selectTimelineModal'),
+            timelineInfoOverlay: document.getElementById('timelineInfoOverlay'),
+            timelineInfoModal: document.getElementById('timelineInfoModal')
         };
     }
 
@@ -153,20 +168,33 @@ export class Editor {
         });
 
         document.getElementById('addCharacterBtn').addEventListener('click', () => {
-            this.requestCharacter();
+            this.showCharacterSelector();
         });
 
-        document.getElementById('insertTermBtn').addEventListener('click', () => {
-            this.requestTerm();
+        
+        document.getElementById('addLinkedTermBtn').addEventListener('click', () => {
+            this.showLinkedTermSelector();
         });
 
-        document.getElementById('insertTimelineBtn').addEventListener('click', () => {
-            this.requestTimelineEvent();
+        document.getElementById('addLinkedTimelineBtn').addEventListener('click', () => {
+            this.showLinkedTimelineSelector();
         });
 
         this.initNewChapterModal();
 
         this.initSettingsModal();
+
+        this.initSelectCharacterModal();
+
+        this.initCharacterInfoModal();
+
+        this.initSelectTermModal();
+
+        this.initTermInfoModal();
+
+        this.initSelectTimelineModal();
+
+        this.initTimelineInfoModal();
 
         this.initHotkeys();
     }
@@ -242,6 +270,667 @@ export class Editor {
         });
     }
 
+    initSelectCharacterModal() {
+        const modal = this.elements.selectCharacterModal;
+
+        document.getElementById('closeSelectCharacterModal').addEventListener('click', () => {
+            this.hideSelectCharacterModal();
+        });
+
+        document.getElementById('cancelSelectCharacterBtn').addEventListener('click', () => {
+            this.hideSelectCharacterModal();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideSelectCharacterModal();
+            }
+        });
+
+        document.getElementById('selectCharacterSearch').addEventListener('input', (e) => {
+            this.filterSelectCharacters(e.target.value);
+        });
+    }
+
+    initCharacterInfoModal() {
+        document.getElementById('closeCharacterInfoModal').addEventListener('click', () => {
+            this.hideCharacterInfo();
+        });
+
+        document.getElementById('closeCharacterInfoBtn').addEventListener('click', () => {
+            this.hideCharacterInfo();
+        });
+
+        this.elements.characterInfoOverlay.addEventListener('click', (e) => {
+            if (e.target === this.elements.characterInfoOverlay) {
+                this.hideCharacterInfo();
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target && e.target.id === 'editCharacterBtn') {
+                console.log('[Editor] Клік на кнопку Редагувати');
+                this.editCurrentCharacter();
+            }
+        });
+    }
+
+    async loadCharactersForSelection() {
+        try {
+            const { default: characterService } = await import('../../services/CharacterService.js');
+
+            const characters = await characterService.getAll(this.currentBook.id);
+
+            this.availableCharacters = characters;
+            this.renderSelectCharacters(characters);
+
+            console.log('[Editor] Завантажено', characters.length, 'персонажів для вибору');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження персонажів:', error);
+            this.availableCharacters = [];
+            this.renderSelectCharacters([]);
+        }
+    }
+
+    renderSelectCharacters(characters) {
+        const list = document.getElementById('selectCharactersList');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (characters.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Персонажів не знайдено</div>';
+            return;
+        }
+
+        const roleLabels = {
+            protagonist: 'Головний герой',
+            antagonist: 'Антагоніст',
+            secondary: 'Другорядний',
+            minor: 'Епізодичний'
+        };
+
+        const roleIcons = {
+            protagonist: '⭐',
+            antagonist: '💀',
+            secondary: '👤',
+            minor: '👥'
+        };
+
+        characters.forEach(character => {
+            const card = document.createElement('div');
+            card.className = 'select-character-card';
+            card.dataset.characterId = character.id;
+
+            card.innerHTML = `
+            <div class="select-character-card-header">
+                <div class="select-character-icon">${roleIcons[character.role] || '👤'}</div>
+                <div>
+                    <h4 class="select-character-name">${character.name}</h4>
+                    <span class="select-character-role ${character.role}">${roleLabels[character.role] || character.role}</span>
+                </div>
+            </div>
+            ${character.age ? `<p class="select-character-meta">Вік: ${character.age}</p>` : ''}
+            ${character.occupation ? `<p class="select-character-meta">Професія: ${character.occupation}</p>` : ''}
+        `;
+
+            card.addEventListener('click', () => {
+                this.addCharacterToChapter(character);
+                this.hideSelectCharacterModal();
+            });
+
+            list.appendChild(card);
+        });
+    }
+
+    filterSelectCharacters(query) {
+        if (!this.availableCharacters) return;
+
+        const filtered = this.availableCharacters.filter(char =>
+            char.name.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderSelectCharacters(filtered);
+    }
+
+    hideSelectCharacterModal() {
+        this.elements.selectCharacterModal.classList.remove('active');
+        document.getElementById('selectCharacterSearch').value = '';
+    }
+
+    initSelectTermModal() {
+        const modal = this.elements.selectTermModal;
+
+        document.getElementById('closeSelectTermModal').addEventListener('click', () => {
+            this.hideSelectTermModal();
+        });
+
+        document.getElementById('cancelSelectTermBtn').addEventListener('click', () => {
+            this.hideSelectTermModal();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideSelectTermModal();
+            }
+        });
+
+        document.getElementById('selectTermSearch').addEventListener('input', (e) => {
+            this.filterSelectTerms(e.target.value);
+        });
+    }
+
+    initTermInfoModal() {
+        document.getElementById('closeTermInfoModal').addEventListener('click', () => {
+            this.hideTermInfo();
+        });
+
+        document.getElementById('closeTermInfoBtn').addEventListener('click', () => {
+            this.hideTermInfo();
+        });
+
+        this.elements.termInfoOverlay.addEventListener('click', (e) => {
+            if (e.target === this.elements.termInfoOverlay) {
+                this.hideTermInfo();
+            }
+        });
+    }
+
+    async showTermSelector() {
+        if (!this.currentBook) {
+            this.showToast('Спочатку оберіть книгу', 'warning');
+            return;
+        }
+
+        if (!this.currentChapter) {
+            this.showToast('Спочатку оберіть главу', 'warning');
+            return;
+        }
+
+        console.log('[Editor] Відкриваємо вибір терміну');
+
+        await this.loadTermsForSelection();
+
+        this.elements.selectTermModal.classList.add('active');
+    }
+
+    async loadTermsForSelection() {
+        try {
+            const { default: termService } = await import('../../services/TermService.js');
+
+            const terms = await termService.getAll(this.currentBook.id);
+
+            this.availableTerms = terms;
+            this.renderSelectTerms(terms);
+
+            console.log('[Editor] Завантажено', terms.length, 'термінів для вибору');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження термінів:', error);
+            this.availableTerms = [];
+            this.renderSelectTerms([]);
+        }
+    }
+
+    renderSelectTerms(terms) {
+        const list = document.getElementById('selectTermsList');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (terms.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Термінів не знайдено</div>';
+            return;
+        }
+
+        const categoryLabels = {
+            place: 'Місце',
+            person: 'Персона',
+            object: 'Об\'єкт',
+            concept: 'Концепція',
+            technology: 'Технологія',
+            magic: 'Магія',
+            organization: 'Організація',
+            other: 'Інше'
+        };
+
+        terms.forEach(term => {
+            const card = document.createElement('div');
+            card.className = 'select-character-card';
+            card.dataset.termId = term.id;
+
+            card.innerHTML = `
+            <div class="select-character-card-header">
+                <div class="select-character-icon">📖</div>
+                <div>
+                    <h4 class="select-character-name">${term.name}</h4>
+                    ${term.category ? `<span class="select-character-role">${categoryLabels[term.category] || term.category}</span>` : ''}
+                </div>
+            </div>
+            ${term.shortDefinition ? `<p class="select-character-meta">${term.shortDefinition}</p>` : ''}
+        `;
+
+            card.addEventListener('click', () => {
+                this.addTermToChapter(term);
+                this.hideSelectTermModal();
+            });
+
+            list.appendChild(card);
+        });
+    }
+
+    filterSelectTerms(query) {
+        if (!this.availableTerms) return;
+
+        const filtered = this.availableTerms.filter(term =>
+            term.name.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderSelectTerms(filtered);
+    }
+
+    hideSelectTermModal() {
+        this.elements.selectTermModal.classList.remove('active');
+        document.getElementById('selectTermSearch').value = '';
+    }
+
+    async showLinkedTermSelector() {
+        if (!this.currentBook) {
+            this.showToast('Спочатку оберіть книгу', 'warning');
+            return;
+        }
+
+        if (!this.currentChapter) {
+            this.showToast('Спочатку оберіть главу', 'warning');
+            return;
+        }
+
+        console.log('[Editor] Відкриваємо вибір терміну');
+
+        await this.loadTermsForSelection();
+
+        this.elements.selectTermModal.classList.add('active');
+    }
+
+    async addTermToChapter(term) {
+        if (!this.currentChapter) {
+            console.warn('[Editor] Немає поточної глави');
+            return;
+        }
+
+        if (this.linkedTerms.find(t => t.id === term.id)) {
+            this.showToast('Термін вже доданий до глави', 'info');
+            return;
+        }
+
+        this.linkedTerms.push(term);
+        this.renderLinkedTerms();
+        await this.saveLinkedTerms();
+
+        this.showToast(`Термін "${term.name}" додано до глави`, 'success');
+    }
+
+    async removeTermFromChapter(termId) {
+        this.linkedTerms = this.linkedTerms.filter(t => t.id !== termId);
+        this.renderLinkedTerms();
+        await this.saveLinkedTerms();
+        this.showToast('Термін видалено з глави', 'success');
+    }
+
+    renderLinkedTerms() {
+        const container = this.elements.linkedTermsList;
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.linkedTerms.forEach(term => {
+            const item = document.createElement('div');
+            item.className = 'quick-access-item';
+            item.dataset.termId = term.id;
+
+            item.innerHTML = `
+            <i class="fas fa-book-open"></i>
+            <span>${term.name}</span>
+            <button class="remove-quick" title="Видалити">×</button>
+        `;
+
+            item.addEventListener('click', (e) => {
+                if (!e.target.closest('.remove-quick')) {
+                    this.showTermInfo(term);
+                }
+            });
+
+            const removeBtn = item.querySelector('.remove-quick');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeTermFromChapter(term.id);
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    initSelectTimelineModal() {
+        const modal = this.elements.selectTimelineModal;
+
+        document.getElementById('closeSelectTimelineModal').addEventListener('click', () => {
+            this.hideSelectTimelineModal();
+        });
+
+        document.getElementById('cancelSelectTimelineBtn').addEventListener('click', () => {
+            this.hideSelectTimelineModal();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideSelectTimelineModal();
+            }
+        });
+
+        document.getElementById('selectTimelineSearch').addEventListener('input', (e) => {
+            this.filterSelectTimeline(e.target.value);
+        });
+    }
+
+    initTimelineInfoModal() {
+        document.getElementById('closeTimelineInfoModal').addEventListener('click', () => {
+            this.hideTimelineInfo();
+        });
+
+        document.getElementById('closeTimelineInfoBtn').addEventListener('click', () => {
+            this.hideTimelineInfo();
+        });
+
+        this.elements.timelineInfoOverlay.addEventListener('click', (e) => {
+            if (e.target === this.elements.timelineInfoOverlay) {
+                this.hideTimelineInfo();
+            }
+        });
+    }
+
+    async showLinkedTimelineSelector() {
+        if (!this.currentBook) {
+            this.showToast('Спочатку оберіть книгу', 'warning');
+            return;
+        }
+
+        if (!this.currentChapter) {
+            this.showToast('Спочатку оберіть главу', 'warning');
+            return;
+        }
+
+        console.log('[Editor] Відкриваємо вибір події');
+
+        await this.loadTimelineForSelection();
+
+        this.elements.selectTimelineModal.classList.add('active');
+    }
+
+    async loadTimelineForSelection() {
+        try {
+            const { default: timelineService } = await import('../../services/TimelineService.js');
+
+            const events = await timelineService.getAll(this.currentBook.id);
+
+            this.availableTimeline = events;
+            this.renderSelectTimeline(events);
+
+            console.log('[Editor] Завантажено', events.length, 'подій для вибору');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження подій:', error);
+            this.availableTimeline = [];
+            this.renderSelectTimeline([]);
+        }
+    }
+
+    renderSelectTimeline(events) {
+        const list = document.getElementById('selectTimelineList');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (events.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Подій не знайдено</div>';
+            return;
+        }
+
+        events.forEach(event => {
+            const card = document.createElement('div');
+            card.className = 'select-character-card';
+            card.dataset.eventId = event.id;
+
+            const dateStr = event.dateDay || event.dateMonth || event.dateYear
+                ? [event.dateDay, event.dateMonth, event.dateYear].filter(Boolean).join('.')
+                : 'Дата не вказана';
+
+            card.innerHTML = `
+            <div class="select-character-card-header">
+                <div class="select-character-icon">🕐</div>
+                <div>
+                    <h4 class="select-character-name">${event.title}</h4>
+                    <span class="select-character-role">${dateStr}</span>
+                </div>
+            </div>
+            ${event.description ? `<p class="select-character-meta">${event.description.substring(0, 100)}${event.description.length > 100 ? '...' : ''}</p>` : ''}
+        `;
+
+            card.addEventListener('click', () => {
+                this.addTimelineToChapter(event);
+                this.hideSelectTimelineModal();
+            });
+
+            list.appendChild(card);
+        });
+    }
+
+    filterSelectTimeline(query) {
+        if (!this.availableTimeline) return;
+
+        const filtered = this.availableTimeline.filter(event =>
+            event.title.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderSelectTimeline(filtered);
+    }
+
+    hideSelectTimelineModal() {
+        this.elements.selectTimelineModal.classList.remove('active');
+        document.getElementById('selectTimelineSearch').value = '';
+    }
+
+    async showTimelineInfo(event) {
+        this.currentInfoTimeline = event;
+
+        document.getElementById('timelineInfoTitle').textContent = event.title;
+
+        let dateStr = 'Дата не вказана';
+        if (event.dateDay || event.dateMonth || event.dateYear) {
+            const parts = [];
+            if (event.dateDay) parts.push(event.dateDay);
+            if (event.dateMonth) parts.push(event.dateMonth);
+            if (event.dateYear) parts.push(event.dateYear);
+            dateStr = parts.join('.');
+        }
+
+        let charactersHTML = '';
+        if (event.linkedCharacters && event.linkedCharacters.length > 0) {
+            try {
+                const { default: characterService } = await import('../../services/CharacterService.js');
+
+                const characters = [];
+                for (const charId of event.linkedCharacters) {
+                    const char = await characterService.get(this.currentBook.id, charId);
+                    if (char) {
+                        characters.push(char);
+                    }
+                }
+
+                if (characters.length > 0) {
+                    charactersHTML = `
+                <div class="info-row">
+                    <label>Персонажі події</label>
+                    <div class="characters-tags" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                        ${characters.map(char => `
+                            <span class="character-tag">
+                                <i class="fas fa-user"></i>
+                                ${char.name}
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+                `;
+                }
+
+                console.log('[Editor] Завантажено', characters.length, 'персонажів події');
+            } catch (error) {
+                console.error('[Editor] Помилка завантаження персонажів:', error);
+            }
+        }
+
+        const infoBody = document.getElementById('timelineInfoBody');
+        infoBody.innerHTML = `
+        <div class="info-row">
+            <label>Дата</label>
+            <span class="badge secondary">${dateStr}</span>
+        </div>
+        
+        ${event.description ? `
+        <div class="info-row">
+            <label>Опис</label>
+            <p>${event.description}</p>
+        </div>
+        ` : ''}
+        
+        ${charactersHTML}
+        
+        ${event.location ? `
+        <div class="info-row">
+            <label>Локація</label>
+            <p>${event.location}</p>
+        </div>
+        ` : ''}
+    `;
+
+        this.elements.timelineInfoOverlay.classList.add('active');
+    }
+    
+    hideTimelineInfo() {
+        this.elements.timelineInfoOverlay.classList.remove('active');
+        this.currentInfoTimeline = null;
+    }
+
+    async addTimelineToChapter(event) {
+        if (!this.currentChapter) {
+            console.warn('[Editor] Немає поточної глави');
+            return;
+        }
+
+        if (this.linkedTimeline.find(e => e.id === event.id)) {
+            this.showToast('Подія вже додана до глави', 'info');
+            return;
+        }
+
+        this.linkedTimeline.push(event);
+        this.renderLinkedTimeline();
+        await this.saveLinkedTimeline();
+
+        this.showToast(`Подія "${event.title}" додано до глави`, 'success');
+    }
+
+    async removeTimelineFromChapter(eventId) {
+        this.linkedTimeline = this.linkedTimeline.filter(e => e.id !== eventId);
+        this.renderLinkedTimeline();
+        await this.saveLinkedTimeline();
+        this.showToast('Подію видалено з глави', 'success');
+    }
+
+    renderLinkedTimeline() {
+        const container = this.elements.linkedTimelinesList;
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.linkedTimeline.forEach(event => {
+            const item = document.createElement('div');
+            item.className = 'quick-access-item';
+            item.dataset.eventId = event.id;
+
+            const dateStr = event.dateDay || event.dateMonth || event.dateYear
+                ? `${event.dateDay || ''} ${event.dateMonth || ''} ${event.dateYear || ''}`.trim()
+                : '';
+
+            item.innerHTML = `
+            <i class="fas fa-clock"></i>
+            <span>${event.title}</span>
+            <button class="remove-quick" title="Видалити">×</button>
+        `;
+
+            item.addEventListener('click', (e) => {
+                if (!e.target.closest('.remove-quick')) {
+                    this.showTimelineInfo(event);
+                }
+            });
+
+            const removeBtn = item.querySelector('.remove-quick');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeTimelineFromChapter(event.id);
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    showTermInfo(term) {
+        this.currentInfoTerm = term;
+
+        const categoryLabels = {
+            place: 'Місце',
+            person: 'Персона',
+            object: 'Об\'єкт',
+            concept: 'Концепція',
+            technology: 'Технологія',
+            magic: 'Магія',
+            organization: 'Організація',
+            other: 'Інше'
+        };
+
+        document.getElementById('termInfoName').textContent = term.name;
+
+        const infoBody = document.getElementById('termInfoBody');
+        infoBody.innerHTML = `
+        ${term.category ? `
+        <div class="info-row">
+            <label>Категорія</label>
+            <span class="badge secondary">${categoryLabels[term.category] || term.category}</span>
+        </div>
+        ` : ''}
+        
+        ${term.description ? `
+        <div class="info-row">
+            <label>Значення/Опис</label>
+            <p>${term.description}</p>
+        </div>
+        ` : ''}
+        
+        ${term.usage ? `
+        <div class="info-row">
+            <label>Контекст використання</label>
+            <p>${term.usage}</p>
+        </div>
+        ` : ''}
+    `;
+
+        this.elements.termInfoOverlay.classList.add('active');
+    }
+
+    hideTermInfo() {
+        this.elements.termInfoOverlay.classList.remove('active');
+        this.currentInfoTerm = null;
+    }
+
     initHotkeys() {
         document.addEventListener('keydown', (e) => {
             if (e.ctrlKey && e.key === 's') {
@@ -291,6 +980,11 @@ export class Editor {
             console.log('[Editor] Отримано подію timeline:selected:', event);
             this.insertTimelineReference(event);
         });
+
+        eventBus.on('character:linked', (character) => {
+            console.log('[Editor] Отримано персонажа для додавання:', character);
+            this.addCharacterToChapter(character);
+        });
     }
 
     async selectBook(bookId) {
@@ -302,7 +996,21 @@ export class Editor {
             this.elements.chapterTitle.value = '';
             this.elements.chapterNumber.value = 1;
             this.elements.chapterPOV.value = '';
+            this.linkedCharacters = [];
+            this.linkedTerms = [];
+            this.linkedTimeline = [];
             localStorage.removeItem('currentChapterId');
+
+            if (this.elements.chapterCharactersContainer) {
+                this.elements.chapterCharactersContainer.innerHTML = '';
+            }
+
+            if (this.elements.linkedTermsList) {
+                this.elements.linkedTermsList.innerHTML = '';
+            }
+            if (this.elements.linkedTimelinesList) {
+                this.elements.linkedTimelinesList.innerHTML = '';
+            }
         }
 
         try {
@@ -313,6 +1021,7 @@ export class Editor {
                 this.elements.currentBookTitle.textContent = this.currentBook.title;
 
                 await this.loadChapters();
+
 
                 localStorage.setItem('currentBookId', this.currentBook.id);
 
@@ -420,11 +1129,17 @@ export class Editor {
         this.elements.chapterPOV.value = this.currentChapter.pov || '';
 
         this.updateStats();
+
+        this.loadLinkedCharacters();
+
+        this.loadLinkedTerms();
+
+        this.loadLinkedTimeline();
     }
 
     showNewChapterModal() {
         if (!this.currentBook) {
-            alert('Спочатку оберіть книгу');
+            this.showToast('Спочатку оберіть книгу', 'warning');
             return;
         }
 
@@ -448,7 +1163,7 @@ export class Editor {
         const pov = document.getElementById('newChapterPOV').value.trim();
 
         if (!title) {
-            alert('Введіть назву глави');
+            this.showToast('Введіть назву глави', 'error');
             return;
         }
 
@@ -480,12 +1195,17 @@ export class Editor {
             this.showToast('Главу створено успішно!', 'success');
         } catch (error) {
             console.error('[Editor] Помилка створення глави:', error);
-            alert('Помилка створення глави');
+            this.showToast('Помилка створення глави', 'error');
         }
     }
 
     async deleteChapter(chapterId) {
-        if (!confirm('Ви впевнені, що хочете видалити цю главу?')) {
+        const confirmed = await this.showConfirm(
+            'Видалення глави',
+            'Ви впевнені, що хочете видалити цю главу? Цю дію не можна скасувати.'
+        );
+
+        if (!confirmed) {
             return;
         }
 
@@ -510,7 +1230,7 @@ export class Editor {
             this.showToast('Главу видалено', 'success');
         } catch (error) {
             console.error('[Editor] Помилка видалення глави:', error);
-            alert('Помилка видалення глави');
+            this.showToast('Помилка видалення глави', 'error');
         }
     }
 
@@ -663,6 +1383,313 @@ export class Editor {
         this.execCommand('insertHTML', reference);
     }
 
+    async showCharacterSelector() {
+        if (!this.currentBook) {
+            this.showToast('Спочатку оберіть книгу', 'warning');
+            return;
+        }
+
+        if (!this.currentChapter) {
+            this.showToast('Спочатку оберіть главу', 'warning');
+            return;
+        }
+
+        console.log('[Editor] Відкриваємо вибір персонажа');
+
+        await this.loadCharactersForSelection();
+
+        this.elements.selectCharacterModal.classList.add('active');
+    }
+
+    async addCharacterToChapter(character) {
+        if (!this.currentChapter) {
+            console.warn('[Editor] Немає поточної глави');
+            return;
+        }
+
+        if (this.linkedCharacters.find(c => c.id === character.id)) {
+            this.showToast('Персонаж вже доданий до глави', 'info');
+            return;
+        }
+
+        this.linkedCharacters.push(character);
+
+        this.renderLinkedCharacters();
+
+        await this.saveLinkedCharacters();
+
+        this.showToast(`Персонаж "${character.name}" додано до глави`, 'success');
+    }
+
+    renderLinkedCharacters() {
+        const container = this.elements.chapterCharactersContainer;
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.linkedCharacters.forEach(character => {
+            const item = document.createElement('div');
+            item.className = 'linked-item';
+            item.dataset.characterId = character.id;
+
+            item.innerHTML = `
+            <i class="fas fa-user"></i>
+            <span>${character.name}</span>
+            <button class="remove-link" title="Видалити">×</button>
+        `;
+
+            item.addEventListener('click', (e) => {
+                if (!e.target.closest('.remove-link')) {
+                    this.showCharacterInfo(character);
+                }
+            });
+
+            const removeBtn = item.querySelector('.remove-link');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeCharacterFromChapter(character.id);
+            });
+
+            container.appendChild(item);
+        });
+    }
+
+    async removeCharacterFromChapter(characterId) {
+        this.linkedCharacters = this.linkedCharacters.filter(c => c.id !== characterId);
+
+        this.renderLinkedCharacters();
+
+        await this.saveLinkedCharacters();
+
+        this.showToast('Персонажа видалено з глави', 'success');
+    }
+
+    async saveLinkedCharacters() {
+        if (!this.currentChapter) return;
+
+        const characterIds = this.linkedCharacters.map(c => c.id);
+
+        try {
+            await chapterService.update(this.currentBook.id, this.currentChapter.id, {
+                linkedCharacters: characterIds
+            });
+
+            console.log('[Editor] Персонажі глави збережено:', characterIds);
+        } catch (error) {
+            console.error('[Editor] Помилка збереження персонажів:', error);
+        }
+    }
+
+    async loadLinkedCharacters() {
+        if (!this.currentChapter || !this.currentChapter.linkedCharacters) {
+            this.linkedCharacters = [];
+            this.renderLinkedCharacters();
+            return;
+        }
+
+        try {
+            const { default: characterService } = await import('../../services/CharacterService.js');
+
+            const characters = [];
+            for (const charId of this.currentChapter.linkedCharacters) {
+                const char = await characterService.get(this.currentBook.id, charId);
+                if (char) {
+                    characters.push(char);
+                }
+            }
+
+            this.linkedCharacters = characters;
+            this.renderLinkedCharacters();
+
+            console.log('[Editor] Завантажено', characters.length, 'персонажів глави');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження персонажів:', error);
+            this.linkedCharacters = [];
+            this.renderLinkedCharacters();
+        }
+    }
+
+    showCharacterInfo(character) {
+        this.currentInfoCharacter = character;
+
+        const roleLabels = {
+            protagonist: 'Головний герой',
+            antagonist: 'Антагоніст',
+            secondary: 'Другорядний',
+            minor: 'Епізодичний'
+        };
+
+        document.getElementById('characterInfoName').textContent = character.name;
+
+        const infoBody = document.getElementById('characterInfoBody');
+        infoBody.innerHTML = `
+        <div class="info-row">
+            <label>Роль</label>
+            <span class="badge ${character.role}">${roleLabels[character.role] || character.role}</span>
+        </div>
+        
+        ${character.age ? `
+        <div class="info-row">
+            <label>Вік</label>
+            <p>${character.age}</p>
+        </div>
+        ` : ''}
+        
+        ${character.occupation ? `
+        <div class="info-row">
+            <label>Професія</label>
+            <p>${character.occupation}</p>
+        </div>
+        ` : ''}
+        
+        ${character.description ? `
+        <div class="info-row">
+            <label>Опис</label>
+            <p>${character.description}</p>
+        </div>
+        ` : ''}
+        
+        ${character.appearance ? `
+        <div class="info-row">
+            <label>Зовнішність</label>
+            <p>${character.appearance}</p>
+        </div>
+        ` : ''}
+        
+        ${character.personality ? `
+        <div class="info-row">
+            <label>Характер</label>
+            <p>${character.personality}</p>
+        </div>
+        ` : ''}
+        
+        ${character.goals ? `
+        <div class="info-row">
+            <label>Цілі</label>
+            <p>${character.goals}</p>
+        </div>
+        ` : ''}
+        
+        ${character.backstory ? `
+        <div class="info-row">
+            <label>Передісторія</label>
+            <p>${character.backstory}</p>
+        </div>
+        ` : ''}
+    `;
+
+        this.elements.characterInfoOverlay.classList.add('active');
+    }
+
+    hideCharacterInfo() {
+        this.elements.characterInfoOverlay.classList.remove('active');
+        this.currentInfoCharacter = null;
+    }
+
+    editCurrentCharacter() {
+        if (!this.currentInfoCharacter) return;
+
+        const characterToEdit = this.currentInfoCharacter;
+
+        console.log('[Editor] Зберігаємо ID персонажа для редагування:', characterToEdit.id);
+
+        localStorage.setItem('editCharacterId', characterToEdit.id);
+
+        this.hideCharacterInfo();
+
+        window.location.hash = '#characters';
+    }
+
+    async saveLinkedTerms() {
+        if (!this.currentChapter) return;
+
+        const termIds = this.linkedTerms.map(t => t.id);
+
+        try {
+            await chapterService.update(this.currentBook.id, this.currentChapter.id, {
+                linkedTerms: termIds
+            });
+
+            console.log('[Editor] Терміни глави збережено:', termIds);
+        } catch (error) {
+            console.error('[Editor] Помилка збереження термінів:', error);
+        }
+    }
+
+    async loadLinkedTerms() {
+        if (!this.currentChapter || !this.currentChapter.linkedTerms) {
+            this.linkedTerms = [];
+            this.renderLinkedTerms();
+            return;
+        }
+
+        try {
+            const { default: termService } = await import('../../services/TermService.js');
+
+            const terms = [];
+            for (const termId of this.currentChapter.linkedTerms) {
+                const term = await termService.get(this.currentBook.id, termId);
+                if (term) {
+                    terms.push(term);
+                }
+            }
+
+            this.linkedTerms = terms;
+            this.renderLinkedTerms();
+
+            console.log('[Editor] Завантажено', terms.length, 'термінів глави');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження термінів:', error);
+            this.linkedTerms = [];
+            this.renderLinkedTerms();
+        }
+    }
+
+    async saveLinkedTimeline() {
+        if (!this.currentChapter) return;
+
+        const eventIds = this.linkedTimeline.map(e => e.id);
+
+        try {
+            await chapterService.update(this.currentBook.id, this.currentChapter.id, {
+                linkedTimeline: eventIds
+            });
+
+            console.log('[Editor] Події глави збережено:', eventIds);
+        } catch (error) {
+            console.error('[Editor] Помилка збереження подій:', error);
+        }
+    }
+
+    async loadLinkedTimeline() {
+        if (!this.currentChapter || !this.currentChapter.linkedTimeline) {
+            this.linkedTimeline = [];
+            this.renderLinkedTimeline();
+            return;
+        }
+
+        try {
+            const { default: timelineService } = await import('../../services/TimelineService.js');
+
+            const events = [];
+            for (const eventId of this.currentChapter.linkedTimeline) {
+                const event = await timelineService.get(this.currentBook.id, eventId);
+                if (event) {
+                    events.push(event);
+                }
+            }
+
+            this.linkedTimeline = events;
+            this.renderLinkedTimeline();
+
+            console.log('[Editor] Завантажено', events.length, 'подій глави');
+        } catch (error) {
+            console.error('[Editor] Помилка завантаження подій:', error);
+            this.linkedTimeline = [];
+            this.renderLinkedTimeline();
+        }
+    }
+
     toggleSidebar() {
         this.elements.sidebar.classList.toggle('hidden');
     }
@@ -782,7 +1809,7 @@ export class Editor {
 
     async exportChapter(format) {
         if (!this.currentChapter) {
-            alert('Оберіть главу для експорту');
+            this.showToast('Оберіть главу для експорту', 'warning');
             return;
         }
 
@@ -811,13 +1838,13 @@ export class Editor {
 </html>`;
                 this.downloadFile(`${title}.html`, html, 'text/html');
             } else if (format === 'docx') {
-                alert('Експорт у .DOCX буде реалізовано пізніше');
+                this.showToast('Експорт у .DOCX буде реалізовано пізніше', 'info');
             }
 
             this.showToast(`Главу експортовано в ${format.toUpperCase()}`, 'success');
         } catch (error) {
             console.error('[Editor] Помилка експорту:', error);
-            alert('Помилка експорту');
+            this.showToast('Помилка експорту', 'error');
         }
     }
 
@@ -834,7 +1861,95 @@ export class Editor {
     }
 
     showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast show';
+
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        const colors = {
+            success: '#28a745',
+            error: '#dc3545',
+            warning: '#ffc107',
+            info: '#17a2b8'
+        };
+
+        toast.style.cssText = `
+        background: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 300px;
+        max-width: 400px;
+        border-left: 4px solid ${colors[type]};
+        animation: slideIn 0.3s ease;
+    `;
+
+        toast.innerHTML = `
+        <span style="font-size: 20px;">${icons[type]}</span>
+        <span style="flex: 1; color: #333; font-size: 14px;">${message}</span>
+        <button onclick="this.parentElement.remove()" style="background: none; border: none; cursor: pointer; font-size: 18px; color: #999;">×</button>
+    `;
+
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+
         console.log(`[Editor] Toast (${type}):`, message);
+    }
+
+    showConfirm(title, message) {
+        return new Promise((resolve) => {
+            const overlay = document.getElementById('confirmOverlay');
+            const titleEl = document.getElementById('confirmTitle');
+            const messageEl = document.getElementById('confirmMessage');
+            const okBtn = document.getElementById('confirmOkBtn');
+            const cancelBtn = document.getElementById('confirmCancelBtn');
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+
+            overlay.classList.add('active');
+
+            const handleOk = () => {
+                overlay.classList.remove('active');
+                okBtn.removeEventListener('click', handleOk);
+                cancelBtn.removeEventListener('click', handleCancel);
+                overlay.removeEventListener('click', handleOverlay);
+                resolve(true);
+            };
+
+            const handleCancel = () => {
+                overlay.classList.remove('active');
+                okBtn.removeEventListener('click', handleOk);
+                cancelBtn.removeEventListener('click', handleCancel);
+                overlay.removeEventListener('click', handleOverlay);
+                resolve(false);
+            };
+
+            const handleOverlay = (e) => {
+                if (e.target === overlay) {
+                    handleCancel();
+                }
+            };
+
+            okBtn.addEventListener('click', handleOk);
+            cancelBtn.addEventListener('click', handleCancel);
+            overlay.addEventListener('click', handleOverlay);
+        });
     }
 
     destroy() {

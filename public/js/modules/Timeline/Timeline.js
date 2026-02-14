@@ -10,6 +10,8 @@ export class Timeline {
         this.filteredEvents = [];
         this.currentFilter = 'all';
         this.searchQuery = '';
+        this.linkedCharacters = [];
+        this.availableCharacters = [];
     }
 
     async init(container) {
@@ -54,6 +56,8 @@ export class Timeline {
             eventDateDay: document.getElementById('eventDateDay'),
             eventDescription: document.getElementById('eventDescription'),
             eventLocation: document.getElementById('eventLocation'),
+            eventCharactersContainer: document.getElementById('eventCharactersContainer'),
+            selectEventCharacterModal: document.getElementById('selectEventCharacterModal'),
 
             totalCount: document.getElementById('totalCount'),
             plotCount: document.getElementById('plotCount'),
@@ -78,6 +82,12 @@ export class Timeline {
             this.searchQuery = e.target.value;
             this.applyFilters();
         });
+
+        document.getElementById('addEventCharacterBtn').addEventListener('click', () => {
+            this.showCharacterSelector();
+        });
+
+        this.initSelectCharacterModal();
 
         this.initModalHandlers();
     }
@@ -104,6 +114,28 @@ export class Timeline {
         });
     }
 
+    initSelectCharacterModal() {
+        const modal = this.elements.selectEventCharacterModal;
+
+        document.getElementById('closeSelectEventCharacterModal').addEventListener('click', () => {
+            this.hideSelectCharacterModal();
+        });
+
+        document.getElementById('cancelSelectEventCharacterBtn').addEventListener('click', () => {
+            this.hideSelectCharacterModal();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                this.hideSelectCharacterModal();
+            }
+        });
+
+        document.getElementById('selectEventCharacterSearch').addEventListener('input', (e) => {
+            this.filterSelectCharacters(e.target.value);
+        });
+    }
+
     subscribeToEvents() {
         eventBus.on('book:selected', (book) => {
             console.log('[Timeline] Отримано подію book:selected:', book);
@@ -122,6 +154,36 @@ export class Timeline {
             }
         } catch (error) {
             console.error('[Timeline] Помилка завантаження книги:', error);
+        }
+    }
+
+    async loadEventCharacters(event) {
+        this.linkedCharacters = [];
+
+        if (!event.linkedCharacters || event.linkedCharacters.length === 0) {
+            this.renderLinkedCharacters();
+            return;
+        }
+
+        try {
+            const { default: characterService } = await import('../../services/CharacterService.js');
+
+            const characters = [];
+            for (const charId of event.linkedCharacters) {
+                const char = await characterService.get(this.currentBook.id, charId);
+                if (char) {
+                    characters.push(char);
+                }
+            }
+
+            this.linkedCharacters = characters;
+            this.renderLinkedCharacters();
+
+            console.log('[Timeline] Завантажено', characters.length, 'персонажів події');
+        } catch (error) {
+            console.error('[Timeline] Помилка завантаження персонажів:', error);
+            this.linkedCharacters = [];
+            this.renderLinkedCharacters();
         }
     }
 
@@ -324,8 +386,12 @@ export class Timeline {
             this.elements.eventDateDay.value = event.dateDay || '';
             this.elements.eventDescription.value = event.description || '';
             this.elements.eventLocation.value = event.location || '';
+
+            this.loadEventCharacters(event);
         } else {
             this.elements.eventForm.reset();
+            this.linkedCharacters = [];
+            this.renderLinkedCharacters();
         }
 
         this.elements.eventModal.classList.add('active');
@@ -352,7 +418,8 @@ export class Timeline {
             dateDay: this.elements.eventDateDay.value.trim(),
             description: this.elements.eventDescription.value.trim(),
             location: this.elements.eventLocation.value.trim(),
-            order: this.events.length
+            order: this.events.length,
+            linkedCharacters: this.linkedCharacters.map(c => c.id)
         };
 
         try {
@@ -397,6 +464,147 @@ export class Timeline {
             console.error('[Timeline] Помилка видалення події:', error);
             alert('Помилка видалення події');
         }
+    }
+
+    async showCharacterSelector() {
+        if (!this.currentBook) {
+            alert('Спочатку оберіть книгу');
+            return;
+        }
+
+        console.log('[Timeline] Відкриваємо вибір персонажа');
+
+        await this.loadCharactersForSelection();
+
+        this.elements.selectEventCharacterModal.classList.add('active');
+    }
+
+    async loadCharactersForSelection() {
+        try {
+            const { default: characterService } = await import('../../services/CharacterService.js');
+
+            const characters = await characterService.getAll(this.currentBook.id);
+
+            this.availableCharacters = characters;
+            this.renderSelectCharacters(characters);
+
+            console.log('[Timeline] Завантажено', characters.length, 'персонажів для вибору');
+        } catch (error) {
+            console.error('[Timeline] Помилка завантаження персонажів:', error);
+            this.availableCharacters = [];
+            this.renderSelectCharacters([]);
+        }
+    }
+
+    renderSelectCharacters(characters) {
+        const list = document.getElementById('selectEventCharactersList');
+
+        if (!list) return;
+
+        list.innerHTML = '';
+
+        if (characters.length === 0) {
+            list.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Персонажів не знайдено</div>';
+            return;
+        }
+
+        const roleLabels = {
+            protagonist: 'Головний герой',
+            antagonist: 'Антагоніст',
+            secondary: 'Другорядний',
+            minor: 'Епізодичний'
+        };
+
+        const roleIcons = {
+            protagonist: '⭐',
+            antagonist: '💀',
+            secondary: '👤',
+            minor: '👥'
+        };
+
+        characters.forEach(character => {
+            const card = document.createElement('div');
+            card.className = 'select-character-card';
+            card.dataset.characterId = character.id;
+
+            card.innerHTML = `
+            <div class="select-character-card-header">
+                <div class="select-character-icon">${roleIcons[character.role] || '👤'}</div>
+                <div>
+                    <h4 class="select-character-name">${character.name}</h4>
+                    <span class="select-character-role ${character.role}">${roleLabels[character.role] || character.role}</span>
+                </div>
+            </div>
+            ${character.age ? `<p class="select-character-meta">Вік: ${character.age}</p>` : ''}
+            ${character.occupation ? `<p class="select-character-meta">Професія: ${character.occupation}</p>` : ''}
+        `;
+
+            card.addEventListener('click', () => {
+                this.addCharacterToEvent(character);
+                this.hideSelectCharacterModal();
+            });
+
+            list.appendChild(card);
+        });
+    }
+
+    filterSelectCharacters(query) {
+        if (!this.availableCharacters) return;
+
+        const filtered = this.availableCharacters.filter(char =>
+            char.name.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderSelectCharacters(filtered);
+    }
+
+    hideSelectCharacterModal() {
+        this.elements.selectEventCharacterModal.classList.remove('active');
+        document.getElementById('selectEventCharacterSearch').value = '';
+    }
+
+    addCharacterToEvent(character) {
+        if (this.linkedCharacters.find(c => c.id === character.id)) {
+            alert('Персонаж вже доданий до події');
+            return;
+        }
+
+        this.linkedCharacters.push(character);
+        this.renderLinkedCharacters();
+
+        console.log('[Timeline] Персонаж додано до події:', character.name);
+    }
+
+    removeCharacterFromEvent(characterId) {
+        this.linkedCharacters = this.linkedCharacters.filter(c => c.id !== characterId);
+        this.renderLinkedCharacters();
+    }
+
+    renderLinkedCharacters() {
+        const container = this.elements.eventCharactersContainer;
+        if (!container) return;
+
+        container.innerHTML = '';
+
+        this.linkedCharacters.forEach(character => {
+            const item = document.createElement('div');
+            item.className = 'linked-item';
+            item.dataset.characterId = character.id;
+
+            item.innerHTML = `
+            <i class="fas fa-user"></i>
+            <span>${character.name}</span>
+            <button class="remove-link" title="Видалити">×</button>
+        `;
+
+            const removeBtn = item.querySelector('.remove-link');
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.removeCharacterFromEvent(character.id);
+            });
+
+            container.appendChild(item);
+        });
     }
 
     destroy() {

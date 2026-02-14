@@ -10,6 +10,7 @@ export class Characters {
         this.filteredCharacters = [];
         this.currentFilter = 'all';
         this.searchQuery = '';
+        this.linkMode = false;
     }
 
     async init(container) {
@@ -26,6 +27,11 @@ export class Characters {
             this.initEventHandlers();
 
             this.subscribeToEvents();
+
+            eventBus.on('editor:request-character-link', () => {
+                console.log('[Characters] Отримано запит на вибір персонажа (в init)');
+                this.enableLinkMode();
+            });
 
             await this.loadCurrentBook();
 
@@ -112,8 +118,14 @@ export class Characters {
             this.selectBook(book.id);
         });
 
-        eventBus.on('editor:request-character', () => {
+        eventBus.on('editor:request-character-link', () => {
             console.log('[Characters] Отримано запит на вибір персонажа');
+            this.enableLinkMode();
+        });
+
+        eventBus.on('character:edit-request', (character) => {
+            console.log('[Characters] Отримано запит на редагування:', character);
+            this.editCharacter(character.id);
         });
     }
 
@@ -152,6 +164,13 @@ export class Characters {
             this.updateStats();
 
             console.log('[Characters] Завантажено', this.characters.length, 'персонажів');
+
+            const editCharacterId = localStorage.getItem('editCharacterId');
+            if (editCharacterId) {
+                console.log('[Characters] Відкриваємо редагування для:', editCharacterId);
+                localStorage.removeItem('editCharacterId');
+                this.editCharacter(editCharacterId);
+            }
         } catch (error) {
             console.error('[Characters] Помилка завантаження персонажів:', error);
             this.showEmptyState('Помилка завантаження персонажів');
@@ -243,11 +262,6 @@ export class Characters {
                 ${character.occupation ? `<p class="character-meta"><strong>Професія:</strong> ${character.occupation}</p>` : ''}
                 ${character.description ? `<p class="character-description">${character.description}</p>` : ''}
             </div>
-            <div class="character-card-footer">
-                <button class="btn-select-character" data-id="${character.id}">
-                    Вибрати для редактора
-                </button>
-            </div>
         `;
 
         card.querySelector('.edit-character').addEventListener('click', (e) => {
@@ -258,11 +272,6 @@ export class Characters {
         card.querySelector('.delete-character').addEventListener('click', (e) => {
             e.stopPropagation();
             this.deleteCharacter(character.id);
-        });
-
-        card.querySelector('.btn-select-character').addEventListener('click', (e) => {
-            e.stopPropagation();
-            this.selectCharacterForEditor(character);
         });
 
         return card;
@@ -295,7 +304,12 @@ export class Characters {
         this.currentCharacter = character;
 
         const title = character ? 'Редагувати персонажа' : 'Новий персонаж';
-        document.querySelector('#characterModal .modal-header h3').textContent = title;
+        const modalTitle = document.querySelector('#characterModal .modal-header h3');
+        if (modalTitle) {
+            modalTitle.textContent = title;
+        } else {
+            console.error('[Characters] Не знайдено заголовок модального вікна');
+        }
 
         if (character) {
             this.elements.characterName.value = character.name || '';
@@ -383,11 +397,57 @@ export class Characters {
         }
     }
 
-    selectCharacterForEditor(character) {
-        console.log('[Characters] Відправка персонажа в редактор:', character.name);
-        eventBus.emit('character:selected', character);
+    enableLinkMode() {
+        this.linkMode = true;
+        console.log('[Characters] Режим вибору увімкнено');
 
-        alert(`Персонаж "${character.name}" відправлено в редактор!`);
+        this.showLinkModeMessage();
+    }
+
+    disableLinkMode() {
+        this.linkMode = false;
+        console.log('[Characters] Режим вибору вимкнено');
+
+        this.hideLinkModeMessage();
+    }
+
+    showLinkModeMessage() {
+        const message = document.createElement('div');
+        message.id = 'linkModeMessage';
+        message.className = 'link-mode-message';
+        message.innerHTML = `
+        <i class="fas fa-link"></i>
+        <span>Оберіть персонажа для додавання до глави</span>
+        <button id="cancelLinkMode" class="btn-cancel-link">
+            <i class="fas fa-times"></i> Скасувати
+        </button>
+    `;
+
+        const container = document.querySelector('.characters-page');
+        if (container && !document.getElementById('linkModeMessage')) {
+            container.insertBefore(message, container.firstChild);
+
+            document.getElementById('cancelLinkMode').addEventListener('click', () => {
+                this.disableLinkMode();
+            });
+        }
+    }
+
+    hideLinkModeMessage() {
+        const message = document.getElementById('linkModeMessage');
+        if (message) {
+            message.remove();
+        }
+    }
+
+    selectCharacterForLink(character) {
+        console.log('[Characters] Персонажа обрано для зв\'язування:', character.name);
+
+        eventBus.emit('character:linked', character);
+
+        this.disableLinkMode();
+
+        eventBus.emit('navigate', 'editor');
     }
 
     destroy() {
