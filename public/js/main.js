@@ -13,7 +13,7 @@ class App {
     }
 
     async init() {
-        console.log('⌛ Writing Studio запускається...');
+        console.log('⌛ Mundoria запускається...');
 
         this.findElements();
 
@@ -25,22 +25,6 @@ class App {
             this.showAuthModal();
         } else {
             this.showApp();
-        }
-    }
-
-    async loadComponents() {
-        try {
-            const response = await fetch('components/bookshelf.html');
-            if (response.ok) {
-                const html = await response.text();
-                const container = document.getElementById('bookshelf-container');
-                if (container) {
-                    container.innerHTML = html;
-                    console.log('✅ Bookshelf component завантажено');
-                }
-            }
-        } catch (error) {
-            console.error('❌ Помилка завантаження компонентів:', error);
         }
     }
 
@@ -205,8 +189,8 @@ class App {
     async initializeBookshelf() {
         try {
             const { default: Bookshelf } = await import('./modules/Bookshelf/Bookshelf.js');
-            const bookshelf = new Bookshelf();
-            await bookshelf.init();
+            window.bookshelf = new Bookshelf();
+            await window.bookshelf.init();
 
             window.bookshelf = bookshelf;
 

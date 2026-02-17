@@ -156,7 +156,7 @@ export class Editor {
         });
 
         document.getElementById('blockquoteBtn').addEventListener('click', () => {
-            this.insertBlockquote();
+            this.toggleBlockquote();
         });
 
         document.getElementById('focusModeBtn').addEventListener('click', () => {
@@ -180,6 +180,10 @@ export class Editor {
             this.showLinkedTimelineSelector();
         });
 
+        document.getElementById('clearFormattingBtn')?.addEventListener('click', () => {
+            this.clearAllFormatting();
+        });
+
         this.initNewChapterModal();
 
         this.initSettingsModal();
@@ -197,6 +201,18 @@ export class Editor {
         this.initTimelineInfoModal();
 
         this.initHotkeys();
+
+        this.elements.textEditor.addEventListener('keyup', () => {
+            this.updateToolbarState();
+        });
+
+        this.elements.textEditor.addEventListener('mouseup', () => {
+            this.updateToolbarState();
+        });
+
+        this.elements.textEditor.addEventListener('click', () => {
+            this.updateToolbarState();
+        });
     }
 
     initNewChapterModal() {
@@ -257,17 +273,6 @@ export class Editor {
             document.getElementById('lineHeightValue').textContent = e.target.value;
         });
 
-        document.getElementById('exportTxtBtn').addEventListener('click', () => {
-            this.exportChapter('txt');
-        });
-
-        document.getElementById('exportHtmlBtn').addEventListener('click', () => {
-            this.exportChapter('html');
-        });
-
-        document.getElementById('exportDocxBtn').addEventListener('click', () => {
-            this.exportChapter('docx');
-        });
     }
 
     initSelectCharacterModal() {
@@ -1094,12 +1099,25 @@ export class Editor {
     async onChapterSelected(chapterId) {
         if (!chapterId) return;
 
+        if (!this.currentBook) {
+            console.warn('[Editor] Немає поточної книги');
+            return;
+        }
+
         try {
             if (this.currentChapter) {
                 await this.saveChapter();
             }
 
-            this.currentChapter = await chapterService.get(this.currentBook.id, chapterId);
+            const chapter = await chapterService.get(this.currentBook.id, chapterId);
+
+            if (!chapter) {
+                console.warn('[Editor] Главу не знайдено:', chapterId);
+                localStorage.removeItem('currentChapterId');
+                return;
+            }
+
+            this.currentChapter = chapter;
 
             this.loadChapterIntoEditor();
 
@@ -1347,8 +1365,241 @@ export class Editor {
         }
     }
 
-    insertBlockquote() {
-        this.execCommand('formatBlock', 'blockquote');
+    toggleBlockquote() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        const btn = document.getElementById('blockquoteBtn');
+
+        let element = range.commonAncestorContainer;
+        if (element.nodeType === 3) {
+            element = element.parentElement;
+        }
+
+        let isInBlockquote = false;
+        let blockquoteElement = null;
+
+        while (element && element !== this.elements.textEditor) {
+            if (element.tagName === 'BLOCKQUOTE') {
+                isInBlockquote = true;
+                blockquoteElement = element;
+                break;
+            }
+            element = element.parentElement;
+        }
+
+        if (isInBlockquote) {
+            document.execCommand('formatBlock', false, '<p>');
+            btn.classList.remove('active');
+            this.showToast('Режим цитати вимкнено', 'info');
+            console.log('[Editor] Режим цитати вимкнено');
+        } else {
+            const selectedText = selection.toString();
+
+            if (!selectedText) {
+                const placeholder = 'Текст цитати...';
+                document.execCommand('insertText', false, placeholder);
+
+                const newRange = document.createRange();
+                const textNode = selection.anchorNode;
+                newRange.setStart(textNode, 0);
+                newRange.setEnd(textNode, placeholder.length);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+
+            document.execCommand('formatBlock', false, '<blockquote>');
+            btn.classList.add('active');
+            this.showToast('Режим цитати увімкнено', 'info');
+            console.log('[Editor] Режим цитати увімкнено');
+        }
+    }
+
+    updateToolbarState() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+
+        const range = selection.getRangeAt(0);
+        let element = range.commonAncestorContainer;
+        if (element.nodeType === 3) {
+            element = element.parentElement;
+        }
+
+        let isInBlockquote = false;
+        let currentElement = element;
+        while (currentElement && currentElement !== this.elements.textEditor) {
+            if (currentElement.tagName === 'BLOCKQUOTE') {
+                isInBlockquote = true;
+                break;
+            }
+            currentElement = currentElement.parentElement;
+        }
+
+        const quoteBtn = document.getElementById('blockquoteBtn');
+        if (quoteBtn) {
+            if (isInBlockquote) {
+                quoteBtn.classList.add('active');
+                quoteBtn.title = 'Вимкнути цитату';
+            } else {
+                quoteBtn.classList.remove('active');
+                quoteBtn.title = 'Цитата';
+            }
+        }
+
+        const isBold = document.queryCommandState('bold');
+        const boldBtn = document.querySelector('[data-command="bold"]');
+        if (boldBtn) {
+            if (isBold) {
+                boldBtn.classList.add('active');
+                boldBtn.title = 'Вимкнути жирний (Ctrl+B)';
+            } else {
+                boldBtn.classList.remove('active');
+                boldBtn.title = 'Жирний (Ctrl+B)';
+            }
+        }
+
+        const isItalic = document.queryCommandState('italic');
+        const italicBtn = document.querySelector('[data-command="italic"]');
+        if (italicBtn) {
+            if (isItalic) {
+                italicBtn.classList.add('active');
+                italicBtn.title = 'Вимкнути курсив (Ctrl+I)';
+            } else {
+                italicBtn.classList.remove('active');
+                italicBtn.title = 'Курсив (Ctrl+I)';
+            }
+        }
+
+        const isUnderline = document.queryCommandState('underline');
+        const underlineBtn = document.querySelector('[data-command="underline"]');
+        if (underlineBtn) {
+            if (isUnderline) {
+                underlineBtn.classList.add('active');
+                underlineBtn.title = 'Вимкнути підкреслення (Ctrl+U)';
+            } else {
+                underlineBtn.classList.remove('active');
+                underlineBtn.title = 'Підкреслений (Ctrl+U)';
+            }
+        }
+
+        const isOrderedList = document.queryCommandState('insertOrderedList');
+        const olBtn = document.querySelector('[data-command="insertOrderedList"]');
+        if (olBtn) {
+            if (isOrderedList) {
+                olBtn.classList.add('active');
+                olBtn.title = 'Вимкнути нумерований список';
+            } else {
+                olBtn.classList.remove('active');
+                olBtn.title = 'Нумерований список';
+            }
+        }
+
+        const isUnorderedList = document.queryCommandState('insertUnorderedList');
+        const ulBtn = document.querySelector('[data-command="insertUnorderedList"]');
+        if (ulBtn) {
+            if (isUnorderedList) {
+                ulBtn.classList.add('active');
+                ulBtn.title = 'Вимкнути маркований список';
+            } else {
+                ulBtn.classList.remove('active');
+                ulBtn.title = 'Маркований список';
+            }
+        }
+
+        const headingSelect = document.getElementById('headingSelect');
+        if (headingSelect) {
+            let currentHeading = 'p';
+
+            let checkElement = element;
+            while (checkElement && checkElement !== this.elements.textEditor) {
+                const tag = checkElement.tagName;
+                if (['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(tag)) {
+                    currentHeading = tag.toLowerCase();
+                    break;
+                }
+                checkElement = checkElement.parentElement;
+            }
+
+            headingSelect.value = currentHeading;
+        }
+
+        const isJustifyLeft = document.queryCommandState('justifyLeft');
+        const justifyLeftBtn = document.querySelector('[data-command="justifyLeft"]');
+        if (justifyLeftBtn) {
+            if (isJustifyLeft) {
+                justifyLeftBtn.classList.add('active');
+                justifyLeftBtn.title = 'Вирівняно по лівому краю';
+            } else {
+                justifyLeftBtn.classList.remove('active');
+                justifyLeftBtn.title = 'Вирівняти по лівому краю';
+            }
+        }
+
+        const isJustifyCenter = document.queryCommandState('justifyCenter');
+        const justifyCenterBtn = document.querySelector('[data-command="justifyCenter"]');
+        if (justifyCenterBtn) {
+            if (isJustifyCenter) {
+                justifyCenterBtn.classList.add('active');
+                justifyCenterBtn.title = 'Вирівняно по центру';
+            } else {
+                justifyCenterBtn.classList.remove('active');
+                justifyCenterBtn.title = 'Вирівняти по центру';
+            }
+        }
+
+        const isJustifyRight = document.queryCommandState('justifyRight');
+        const justifyRightBtn = document.querySelector('[data-command="justifyRight"]');
+        if (justifyRightBtn) {
+            if (isJustifyRight) {
+                justifyRightBtn.classList.add('active');
+                justifyRightBtn.title = 'Вирівняно по правому краю';
+            } else {
+                justifyRightBtn.classList.remove('active');
+                justifyRightBtn.title = 'Вирівняти по правому краю';
+            }
+        }
+
+        const isJustifyFull = document.queryCommandState('justifyFull');
+        const justifyFullBtn = document.querySelector('[data-command="justifyFull"]');
+        if (justifyFullBtn) {
+            if (isJustifyFull) {
+                justifyFullBtn.classList.add('active');
+                justifyFullBtn.title = 'Вирівняно по ширині';
+            } else {
+                justifyFullBtn.classList.remove('active');
+                justifyFullBtn.title = 'Вирівняти по ширині';
+            }
+        }
+
+        console.log('[Editor] Toolbar state updated:', {
+            bold: isBold,
+            italic: isItalic,
+            underline: isUnderline,
+            blockquote: isInBlockquote,
+            orderedList: isOrderedList,
+            unorderedList: isUnorderedList,
+            justifyLeft: isJustifyLeft,
+            justifyCenter: isJustifyCenter,
+            justifyRight: isJustifyRight,
+            justifyFull: isJustifyFull
+        });
+    }
+
+    clearAllFormatting() {
+        const selection = window.getSelection();
+        if (!selection.rangeCount) {
+            this.elements.textEditor.focus();
+            document.execCommand('selectAll');
+        }
+
+        document.execCommand('removeFormat', false, null);
+        document.execCommand('formatBlock', false, '<p>');
+
+        this.elements.textEditor.focus();
+
+        this.showToast('Всі стилі очищено', 'success');
+        this.updateToolbarState();
     }
 
     requestCharacter() {
@@ -1691,11 +1942,56 @@ export class Editor {
     }
 
     toggleSidebar() {
-        this.elements.sidebar.classList.toggle('hidden');
+        const sidebar = document.getElementById('editorSidebar');
+
+        if (!sidebar) {
+            console.warn('[toggleSidebar] Бокову панель не знайдено');
+            return;
+        }
+
+        const isHidden = sidebar.classList.contains('hidden');
+
+        if (isHidden) {
+            sidebar.classList.remove('hidden');
+            console.log('[toggleSidebar] Бокова панель показана');
+        } else {
+            sidebar.classList.add('hidden');
+            console.log('[toggleSidebar] Бокова панель схована');
+        }
     }
 
     toggleFocusMode() {
-        document.querySelector('.editor-page').classList.toggle('focus-mode');
+        const editorPage = document.querySelector('.editor-page');
+        const chapterHeader = document.querySelector('.chapter-header-section');
+        const sidebar = document.getElementById('editorSidebar');
+
+        const isFocusMode = editorPage.classList.contains('focus-mode');
+
+        if (isFocusMode) {
+            editorPage.classList.remove('focus-mode');
+
+            if (chapterHeader) {
+                chapterHeader.style.display = 'block';
+            }
+
+            if (sidebar && !sidebar.classList.contains('hidden')) {
+                sidebar.style.display = 'block';
+            }
+
+            console.log('[toggleFocusMode] Режим фокусу ВИМКНЕНО');
+        } else {
+            editorPage.classList.add('focus-mode');
+
+            if (chapterHeader) {
+                chapterHeader.style.display = 'none';
+            }
+
+            if (sidebar) {
+                sidebar.style.display = 'none';
+            }
+
+            console.log('[toggleFocusMode] Режим фокусу УВІМКНЕНО');
+        }
     }
 
     toggleFullscreen() {

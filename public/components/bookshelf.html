@@ -30,3 +30,258 @@
         </div>
     </div>
 </div>
+
+<div class="modal-overlay" id="bookModal">
+    <div class="modal medium">
+        <div class="modal-header">
+            <h3>📚 Нова книга</h3>
+            <button class="btn-close" id="closeBookModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <form id="bookForm">
+                <div class="form-section">
+                    <h4 class="section-title">📋 Основна інформація</h4>
+
+                    <div class="form-group">
+                        <label class="form-label" for="bookTitle">Назва книги *</label>
+                        <input type="text"
+                               id="bookTitle"
+                               class="form-input"
+                               placeholder="Введіть назву вашої книги..."
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="bookAuthor">Автор</label>
+                        <input type="text"
+                               id="bookAuthor"
+                               class="form-input"
+                               placeholder="Ваше ім'я...">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Жанри</label>
+                        <div class="selected-genres" id="selectedGenres">
+                        </div>
+                        <button type="button" class="btn secondary" id="addGenreBtn" style="margin-top: 10px;">
+                            <i class="fas fa-plus"></i> Додати жанр
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h4 class="section-title">📝 Опис</h4>
+
+                    <div class="form-group">
+                        <label class="form-label" for="bookDescription">Про що ваша книга?</label>
+                        <textarea id="bookDescription"
+                                  class="form-input form-textarea"
+                                  rows="6"
+                                  placeholder="Короткий опис сюжету, головних героїв, або загальної ідеї вашої книги..."></textarea>
+                        <p class="form-hint">Цей опис допоможе вам тримати фокус на основній ідеї під час написання.</p>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelBookBtn">Скасувати</button>
+            <button class="btn primary" id="saveBookBtn">
+                <i class="fas fa-save"></i> Зберегти книгу
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="bookDetailsModal">
+    <div class="modal medium">
+        <div class="modal-header">
+            <h3>📚 <span id="detailsBookTitle">Назва книги</span></h3>
+            <button class="btn-close" id="closeBookDetailsModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <div class="book-details-content">
+                <div class="detail-row">
+                    <label><i class="fas fa-user"></i> Автор</label>
+                    <p id="detailsBookAuthor">—</p>
+                </div>
+
+                <div class="detail-row">
+                    <label><i class="fas fa-bookmark"></i> Жанр</label>
+                    <p id="detailsBookGenre">—</p>
+                </div>
+
+                <div class="detail-row">
+                    <label><i class="fas fa-align-left"></i> Опис</label>
+                    <p id="detailsBookDescription" class="description-text">—</p>
+                </div>
+
+                <div class="detail-row">
+                    <label><i class="fas fa-calendar"></i> Створено</label>
+                    <p id="detailsBookCreated">—</p>
+                </div>
+
+                <div class="detail-row">
+                    <label><i class="fas fa-clock"></i> Остання зміна</label>
+                    <p id="detailsBookUpdated">—</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn secondary" id="closeDetailsBtn">Закрити</button>
+            <button class="btn primary" id="editBookFromDetailsBtn">
+                <i class="fas fa-edit"></i> Редагувати
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="genreSelectModal">
+    <div class="modal small">
+        <div class="modal-header">
+            <h3>📚 Виберіть жанр</h3>
+            <button class="btn-close" id="closeGenreSelectModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-content">
+            <div class="genres-grid" id="genresGrid">
+                <button class="genre-option" data-genre="fantasy">
+                    <span class="genre-icon">✨</span>
+                    <span class="genre-name">Фентезі</span>
+                </button>
+                <button class="genre-option" data-genre="scifi">
+                    <span class="genre-icon">🚀</span>
+                    <span class="genre-name">Наукова фантастика</span>
+                </button>
+                <button class="genre-option" data-genre="mystery">
+                    <span class="genre-icon">🔍</span>
+                    <span class="genre-name">Детектив</span>
+                </button>
+                <button class="genre-option" data-genre="romance">
+                    <span class="genre-icon">💕</span>
+                    <span class="genre-name">Романтика</span>
+                </button>
+                <button class="genre-option" data-genre="thriller">
+                    <span class="genre-icon">😱</span>
+                    <span class="genre-name">Трилер</span>
+                </button>
+                <button class="genre-option" data-genre="horror">
+                    <span class="genre-icon">👻</span>
+                    <span class="genre-name">Жахи</span>
+                </button>
+                <button class="genre-option" data-genre="adventure">
+                    <span class="genre-icon">🗺️</span>
+                    <span class="genre-name">Пригоди</span>
+                </button>
+                <button class="genre-option" data-genre="historical">
+                    <span class="genre-icon">🏛️</span>
+                    <span class="genre-name">Історична проза</span>
+                </button>
+                <button class="genre-option" data-genre="drama">
+                    <span class="genre-icon">🎭</span>
+                    <span class="genre-name">Драма</span>
+                </button>
+                <button class="genre-option" data-genre="comedy">
+                    <span class="genre-icon">😄</span>
+                    <span class="genre-name">Комедія</span>
+                </button>
+                <button class="genre-option" data-genre="other">
+                    <span class="genre-icon">📖</span>
+                    <span class="genre-name">Інше</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="confirm-overlay" id="confirmDeleteBookOverlay" style="display: none;">
+    <div class="confirm-modal">
+        <div class="confirm-icon">⚠️</div>
+        <h3 class="confirm-title" id="confirmDeleteBookTitle">Видалення книги</h3>
+        <p class="confirm-message" id="confirmDeleteBookMessage">
+            Ви впевнені, що хочете видалити цю книгу?<br>
+            Ця дія також видалить всі глави цієї книги!
+        </p>
+        <div class="confirm-buttons">
+            <button class="btn secondary" id="cancelDeleteBookBtn">Скасувати</button>
+            <button class="btn danger" id="confirmDeleteBookBtn">Видалити</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="importBookModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3>📥 Імпорт книги</h3>
+            <button class="btn-close" id="closeImportModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content" style="padding: 30px;">
+            <div class="import-area">
+                <div class="file-drop-zone" id="fileDropZone">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: var(--primary-gold); margin-bottom: 15px;"></i>
+                    <h4>Перетягніть файл сюди</h4>
+                    <p style="color: var(--text-secondary); margin: 10px 0;">або</p>
+                    <button class="btn primary" id="selectFileBtn">
+                        <i class="fas fa-folder-open"></i>
+                        Обрати файл
+                    </button>
+                    <input type="file" id="fileInput" accept=".txt,.md,.html" style="display: none;">
+                    <p style="margin-top: 15px; font-size: 12px; color: var(--text-light);">
+                        Підтримуються формати: TXT, MD, HTML
+                    </p>
+                </div>
+
+                <div id="importProgress" style="display: none; margin-top: 20px;">
+                    <div class="progress-bar" style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden;">
+                        <div class="progress-fill" id="importProgressBar" style="width: 0%; height: 100%; background: var(--primary-gold); transition: width 0.3s ease;"></div>
+                    </div>
+                    <p id="importStatus" style="margin-top: 10px; text-align: center; color: var(--text-secondary);"></p>
+                </div>
+
+                <div id="importPreview" style="display: none; margin-top: 20px;">
+                    <h4>Попередній перегляд</h4>
+                    <div class="form-group">
+                        <label class="form-label">Назва книги</label>
+                        <input type="text" class="form-input" id="importedBookTitle" placeholder="Введіть назву книги">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Автор</label>
+                        <input type="text" class="form-input" id="importedBookAuthor" placeholder="Введіть ім'я автора">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Жанр</label>
+                        <button class="btn secondary btn-full-width" id="importSelectGenresBtn">
+                            <i class="fas fa-tags"></i>
+                            Обрати жанри
+                        </button>
+                        <div id="importSelectedGenres" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                    </div>
+                    <div class="import-stats">
+                        <p><strong>Розмір файлу:</strong> <span id="importFileSize">0</span> KB</p>
+                        <p><strong>Кількість символів:</strong> <span id="importCharCount">0</span></p>
+                        <p><strong>Приблизна кількість слів:</strong> <span id="importWordCount">0</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelImportBtn">Скасувати</button>
+            <button class="btn primary" id="confirmImportBtn" style="display: none;">
+                <i class="fas fa-check"></i>
+                Імпортувати
+            </button>
+        </div>
+    </div>
+</div>

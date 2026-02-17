@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writing Studio</title>
+    <title>Mundoria</title>
+
+    <link rel="icon" type="image/png" href="/assets/images/favicon-64.png">
+    <link rel="shortcut icon" type="image/png" href="/assets/images/favicon-64.png">
 
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
@@ -12,14 +15,16 @@
     <link rel="stylesheet" href="css/terms.css">
     <link rel="stylesheet" href="css/timeline.css">
     <link rel="stylesheet" href="css/bookshelf.css">
+    <link rel="stylesheet" href="/css/statistics.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
 <body>
     <div id="app-loader" style="display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column;">
         <span class="loader"></span>
-        <p style="margin-top: 20px; color: var(--text-secondary);">Завантаження Writing Studio...</p>
+        <p style="margin-top: 20px; color: var(--text-secondary);">Завантаження Mundoria...</p>
     </div>
 
     <div id="app-container" class="app-container" style="display: none;">
@@ -38,6 +43,9 @@
                 </button>
                 <button class="tab" data-tab="timeline">
                     ⌛ Хронологія
+                </button>
+                <button class="tab" data-tab="statistics">
+                    📜 Статистика
                 </button>
             </nav>
 

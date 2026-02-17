@@ -1,7 +1,7 @@
 {
-    "name": "writing-studio",
+    "name": "mundoria",
     "version": "1.0.0",
-    "description": "���������� ������� ��� ����������� �� ����������",
+    "description": "Mundoria - реальність, де народжуються світи",
     "main": "public/js/main.js",
     "type": "module",
     "scripts": {

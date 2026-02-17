@@ -100,11 +100,13 @@
     height: 100%;
 }
 
-.editor-sidebar.hidden {
-    width: 0;
-    padding: 0;
-    opacity: 0;
-}
+    .editor-sidebar.hidden {
+        width: 0;
+        padding: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
 
 .sidebar-section {
     margin-bottom: 30px;
@@ -337,6 +339,27 @@
     color: var(--text-light);
 }
 
+.chapter-header {
+    display: flex;
+    transition: all 0.3s ease;
+}
+
+.chapters-sidebar.collapsed ~ .editor-main .chapter-header {
+    display: none;
+}
+
+.chapter-header {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+    .chapter-header.hidden {
+        opacity: 0;
+        transform: translateY(-20px);
+        pointer-events: none;
+        height: 0;
+        overflow: hidden;
+    }
+
 /* Метадані глави */
 .chapter-metadata {
     display: flex;
@@ -420,6 +443,8 @@
     overflow: hidden;
     background: var(--bg-white);
     min-height: 0;
+    align-items: center;
+    transition: all 0.3s ease;
 }
 
 /* Панель форматування */
@@ -466,29 +491,137 @@
     color: var(--book-brown);
 }
 
-.format-btn.active {
-    background: var(--primary-gold);
-    color: var(--book-brown);
-}
+    .format-btn.active,
+    .toolbar-btn.active,
+    [data-command].active {
+        background: var(--primary-gold);
+        color: var(--book-brown);
+        box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        transform: translateY(-1px);
+    }
+
+        .format-btn.active:hover,
+        .toolbar-btn.active:hover,
+        [data-command].active:hover {
+            background: var(--dark-gold);
+        }
 
 .format-select {
-    border: none;
-    background: transparent;
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1.5px solid rgba(212, 175, 55, 0.4);
+    background: linear-gradient(135deg, #fffdf5 0%, #fff8dc 100%);
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    padding: 7px 34px 7px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-family: var(--font-serif);
+    font-weight: 600;
+    color: var(--book-brown);
     cursor: pointer;
+    min-width: 150px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 4px rgba(184, 134, 11, 0.1);
 }
 
-.format-select:focus {
-    outline: none;
-    background: white;
+    .format-select:hover {
+        border-color: var(--primary-gold);
+        background: linear-gradient(135deg, #fff8dc 0%, #ffeea0 100%);
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        box-shadow: 0 2px 8px rgba(212, 175, 55, 0.25);
+    }
+
+    .format-select:focus {
+        outline: none;
+        border-color: var(--primary-gold);
+        background: white;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b8860b' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 16px;
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+    }
+
+/* Жирний текст */
+[data-command="bold"].active {
+    font-weight: bold;
+}
+
+/* Курсив */
+[data-command="italic"].active {
+    font-style: italic;
+}
+
+/* Підкреслений */
+[data-command="underline"].active {
+    text-decoration: underline;
+}
+
+/* Цитата */
+#blockquoteBtn.active {
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    border-left: 3px solid var(--dark-gold);
+}
+
+/* Списки */
+[data-command="insertOrderedList"].active,
+[data-command="insertUnorderedList"].active {
+    background: var(--secondary-gold);
+}
+
+/* Вирівнювання */
+[data-command^="justify"].active {
+    background: rgba(212, 175, 55, 0.2);
+    border: 2px solid var(--primary-gold);
+}
+
+/* Селект заголовків */
+#headingSelect {
+    transition: all 0.2s ease;
+}
+
+    #headingSelect:focus {
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+    }
+
+/* Анімація зміни стану */
+.format-btn,
+.toolbar-btn,
+[data-command] {
+    transition: all 0.2s ease;
+}
+
+    .format-btn.active,
+    .toolbar-btn.active,
+    [data-command].active {
+        animation: buttonActivate 0.2s ease;
+    }
+
+@keyframes buttonActivate {
+    0% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-2px) scale(1.05);
+    }
+
+    100% {
+        transform: translateY(-1px) scale(1);
+    }
 }
 
 /* Основний текстовий редактор */
 .text-editor {
     flex: 1;
-    padding: 30px;
+    padding: 30px 5%;
     overflow-y: auto;
     font-family: var(--font-serif);
     font-size: 16px;
@@ -496,10 +629,12 @@
     color: var(--text-primary);
     background: var(--bg-white);
     outline: none;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
-    width: 100%;
+    width: 90%;
     min-height: 0;
+    box-sizing: border-box;
+    transition: all 0.3s ease;
 }
 
 .text-editor:focus {
@@ -665,13 +800,15 @@
     font-weight: 600;
 }
 
-/* ==========================================
-   РЕЖИМИ РЕДАКТОРА
-   ========================================== */
+/* РЕЖИМИ РЕДАКТОРА */
 
 /* Режим фокусу */
 .editor-page.focus-mode .editor-sidebar {
-    display: none;
+    display: none !important;
+}
+
+.editor-page.focus-mode .chapter-header-section {
+    display: none !important;
 }
 
 .editor-page.focus-mode .editor-toolbar,
@@ -680,14 +817,15 @@
     transition: opacity 0.3s ease;
 }
 
-.editor-page.focus-mode .editor-toolbar:hover,
-.editor-page.focus-mode .editor-status-bar:hover {
-    opacity: 1;
-}
+    .editor-page.focus-mode .editor-toolbar:hover,
+    .editor-page.focus-mode .editor-status-bar:hover {
+        opacity: 1;
+    }
 
 .editor-page.focus-mode .text-editor {
-    max-width: 700px;
-    padding: 50px;
+    max-width: 900px;
+    width: 85%; 
+    padding: 50px 5%;
 }
 
 /* Повноекранний режим */
@@ -1489,20 +1627,127 @@ body.theme-sepia {
     font-style: italic;
 }
 
-/* Скролбар для списків */
-.quick-access-list::-webkit-scrollbar {
-    width: 4px;
+/* Скролбар */
+.text-editor::-webkit-scrollbar {
+    width: 6px; /* ✅ Дуже тонкий */
 }
 
-.quick-access-list::-webkit-scrollbar-track {
-    background: #f0f0f0;
-    border-radius: 2px;
+.text-editor::-webkit-scrollbar-track {
+    background: transparent; /* ✅ Повністю прозорий */
 }
 
-.quick-access-list::-webkit-scrollbar-thumb {
-    background: var(--primary-gold);
-    border-radius: 2px;
+.text-editor::-webkit-scrollbar-thumb {
+    background: transparent; /* ✅ Невидимий за замовчуванням */
+    border-radius: 3px;
+    transition: background 0.2s ease;
 }
+
+/* З'являється тільки при наведенні на редактор */
+.text-editor:hover::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.15); /* ✅ Дуже світлий */
+}
+
+/* Трохи яскравіше при наведенні на сам скролбар */
+.text-editor::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.35);
+}
+
+/* Яскравіше при перетягуванні */
+.text-editor::-webkit-scrollbar-thumb:active {
+    background: rgba(212, 175, 55, 0.5);
+}
+
+/* Firefox */
+.text-editor {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+    .text-editor:hover {
+        scrollbar-color: rgba(212, 175, 55, 0.15) transparent;
+    }
+
+/* ========================================== */
+
+/* БОКОВА ПАНЕЛЬ - також непомітний */
+.editor-sidebar::-webkit-scrollbar {
+    width: 6px; /* ✅ Тонкий */
+}
+
+.editor-sidebar::-webkit-scrollbar-track {
+    background: transparent; /* ✅ Прозорий */
+}
+
+.editor-sidebar::-webkit-scrollbar-thumb {
+    background: transparent; /* ✅ Невидимий за замовчуванням */
+    border-radius: 3px;
+    transition: background 0.2s ease;
+}
+
+/* З'являється при наведенні */
+.editor-sidebar:hover::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.2);
+}
+
+.editor-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.4);
+}
+
+.editor-sidebar::-webkit-scrollbar-thumb:active {
+    background: rgba(212, 175, 55, 0.6);
+}
+
+/* Firefox */
+.editor-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+    .editor-sidebar:hover {
+        scrollbar-color: rgba(212, 175, 55, 0.2) transparent;
+    }
+
+/* ========================================== */
+
+/* СПИСКИ ШВИДКОГО ДОСТУПУ - ще тонші */
+.quick-access-list::-webkit-scrollbar,
+.chapters-outline::-webkit-scrollbar {
+    width: 4px; /* ✅ Супертонкий */
+}
+
+.quick-access-list::-webkit-scrollbar-track,
+.chapters-outline::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.quick-access-list::-webkit-scrollbar-thumb,
+.chapters-outline::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 2px;
+    transition: background 0.2s ease;
+}
+
+.quick-access-list:hover::-webkit-scrollbar-thumb,
+.chapters-outline:hover::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.2);
+}
+
+.quick-access-list::-webkit-scrollbar-thumb:hover,
+.chapters-outline::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.4);
+}
+
+/* Firefox */
+.quick-access-list,
+.chapters-outline {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+}
+
+    .quick-access-list:hover,
+    .chapters-outline:hover {
+        scrollbar-color: rgba(212, 175, 55, 0.2) transparent;
+    }
 
 /* TOAST */
 
@@ -1629,5 +1874,48 @@ body.theme-sepia {
     to {
         transform: translateY(0);
         opacity: 1;
+    }
+}
+
+/* АДАПТИВНІСТЬ ТЕКСТОВОГО РЕДАКТОРА */
+
+/* Великі екрани (1920px+) */
+@media (min-width: 1920px) {
+    .text-editor {
+        max-width: 1400px;
+        width: 85%;
+        padding: 40px 7.5%;
+    }
+}
+
+/* Стандартні екрани (1200-1919px) */
+@media (min-width: 1200px) and (max-width: 1919px) {
+    .text-editor {
+        max-width: 1200px;
+        width: 90%;
+        padding: 35px 5%;
+    }
+}
+
+/* Середні екрани (768-1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .text-editor {
+        max-width: 100%;
+        width: 95%;
+        padding: 30px 2.5%;
+    }
+}
+
+/* Малі екрани (до 767px) */
+@media (max-width: 767px) {
+    .text-editor {
+        max-width: 100%;
+        width: 100%;
+        padding: 20px 3%;
+    }
+
+    .editor-page.focus-mode .text-editor {
+        width: 100%;
+        padding: 30px 3%;
     }
 }

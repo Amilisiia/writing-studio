@@ -79,9 +79,6 @@
                             <span id="currentGoal">0</span> / <span id="targetGoal">1000</span> слів
                         </div>
                     </div>
-                    <button class="btn btn-secondary btn-small btn-full-width" id="setGoalBtn">
-                        Встановити ціль
-                    </button>
                 </div>
             </div>
 
@@ -187,6 +184,9 @@
                             <i class="fas fa-expand"></i>
                         </button>
                     </div>
+                    <button class="toolbar-btn" id="clearFormattingBtn" title="Очистити всі стилі">
+                        <i class="fas fa-eraser"></i>
+                    </button>
                 </div>
 
                 <div class="text-editor"
@@ -388,7 +388,6 @@
             <div class="settings-tabs">
                 <button class="settings-tab active" data-tab="appearance">Вигляд</button>
                 <button class="settings-tab" data-tab="writing">Написання</button>
-                <button class="settings-tab" data-tab="export">Експорт</button>
             </div>
 
             <div class="settings-content">
@@ -450,29 +449,6 @@
                     </div>
                 </div>
 
-                <div class="settings-panel" id="exportPanel">
-                    <div class="setting-group">
-                        <label class="setting-label">Експорт поточної глави</label>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary" id="exportTxtBtn">
-                                <i class="fas fa-file-alt"></i> Експорт у .TXT
-                            </button>
-                            <button class="btn btn-secondary" id="exportHtmlBtn">
-                                <i class="fas fa-code"></i> Експорт у .HTML
-                            </button>
-                            <button class="btn btn-secondary" id="exportDocxBtn">
-                                <i class="fas fa-file-word"></i> Експорт у .DOCX
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="setting-group">
-                        <label class="setting-label">Експорт всієї книги</label>
-                        <button class="btn btn-primary btn-full-width" id="exportBookBtn">
-                            <i class="fas fa-book"></i> Експортувати книгу повністю
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
 

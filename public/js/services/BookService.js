@@ -17,7 +17,8 @@ class BookService {
                 title: bookData.title || 'Нова книга',
                 description: bookData.description || '',
                 author: bookData.author || '',
-                genre: bookData.genre || '',
+                genres: bookData.genres || [],
+                genre: bookData.genre || '', 
                 status: 'draft',
                 chaptersCount: 0,
                 wordsCount: 0,
@@ -30,7 +31,7 @@ class BookService {
             if (result.success) {
                 console.log('📚 Книгу створено:', book.title);
                 eventBus.emit('book:created', book);
-                return { success: true, book };
+                return { success: true, data: book };
             } else {
                 return result;
             }

@@ -24,6 +24,11 @@ class Router {
                 title: '⌛ Хронологія',
                 icon: '⌛',
                 module: null
+            },
+            'statistics': {
+                title: '📜 Статистика',
+                icon: '📜',
+                module: null
             }
         };
     }
@@ -124,7 +129,8 @@ class Router {
                 'editor': '../modules/Editor/Editor.js',
                 'characters': '../modules/Characters/Characters.js',
                 'terms': '../modules/Terms/Terms.js',
-                'timeline': '../modules/Timeline/Timeline.js'
+                'timeline': '../modules/Timeline/Timeline.js',
+                'statistics': '../modules/Statistics/Statistics.js'
             };
 
             const modulePath = moduleMap[route];
@@ -136,7 +142,7 @@ class Router {
                 const module = await import(modulePath);
                 console.log(`[Router] Модуль імпортовано успішно:`, module);
 
-                const ModuleClass = module.default || module.Editor || module.Characters || module.Terms || module.Timeline;
+                const ModuleClass = module.default || module.Editor || module.Characters || module.Terms || module.Timeline || module.Statistics;
 
                 if (!ModuleClass) {
                     console.error(`[Router] ❌ Модуль "${route}" не експортує клас`);
