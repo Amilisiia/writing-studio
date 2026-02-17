@@ -1,0 +1,159 @@
+﻿<meta charset="UTF-8">
+<div class="statistics-page" id="statisticsPage">
+
+    <div class="page-header">
+        <div class="header-left">
+            <h2>📊 Статистика книги</h2>
+            <p class="page-subtitle">Аналітика вашого прогресу</p>
+        </div>
+        <div class="header-right">
+            <button class="btn primary" id="exportBookBtn">
+                <i class="fas fa-download"></i> Експортувати книгу
+            </button>
+        </div>
+    </div>
+
+    <div class="stats-overview">
+        <div class="stat-big-card">
+            <div class="stat-icon">📝</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalWords">0</div>
+                <div class="stat-label">Всього слів</div>
+            </div>
+        </div>
+
+        <div class="stat-big-card">
+            <div class="stat-icon">📖</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalChapters">0</div>
+                <div class="stat-label">Глав</div>
+            </div>
+        </div>
+
+        <div class="stat-big-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalCharacters">0</div>
+                <div class="stat-label">Персонажів</div>
+            </div>
+        </div>
+
+        <div class="stat-big-card">
+            <div class="stat-icon">📚</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalTerms">0</div>
+                <div class="stat-label">Термінів</div>
+            </div>
+        </div>
+
+        <div class="stat-big-card">
+            <div class="stat-icon">⏰</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalEvents">0</div>
+                <div class="stat-label">Подій</div>
+            </div>
+        </div>
+
+        <div class="stat-big-card">
+            <div class="stat-icon">📄</div>
+            <div class="stat-content">
+                <div class="stat-number" id="totalPages">0</div>
+                <div class="stat-label">Сторінок (~250 слів)</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="chapters-stats-section">
+        <h3>📖 Статистика глав</h3>
+        <div class="chapters-stats-table" id="chaptersStatsTable">
+        </div>
+    </div>
+
+    <div class="progress-section">
+        <h3>📈 Прогрес написання</h3>
+        <div class="progress-chart">
+            <canvas id="progressChart"></canvas>
+        </div>
+    </div>
+
+    <div class="characters-distribution">
+        <h3>👥 Розподіл персонажів за ролями</h3>
+        <div class="chart-container">
+            <canvas id="charactersChart"></canvas>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal-overlay" id="exportModal">
+    <div class="modal medium">
+        <div class="modal-header">
+            <h3>📥 Експорт книги</h3>
+            <button class="btn-close" id="closeExportModal">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="modal-content">
+            <div class="export-options">
+                <h4>Оберіть формат експорту:</h4>
+
+                <div class="export-option">
+                    <input type="radio" name="exportFormat" id="exportTxt" value="txt" checked>
+                    <label for="exportTxt">
+                        <i class="fas fa-file-alt"></i>
+                        <strong>Plain Text (.txt)</strong>
+                        <span>Простий текстовий файл</span>
+                    </label>
+                </div>
+
+                <div class="export-option">
+                    <input type="radio" name="exportFormat" id="exportHtml" value="html">
+                    <label for="exportHtml">
+                        <i class="fas fa-code"></i>
+                        <strong>HTML (.html)</strong>
+                        <span>Веб-сторінка з форматуванням</span>
+                    </label>
+                </div>
+
+                <div class="export-option">
+                    <input type="radio" name="exportFormat" id="exportMd" value="md">
+                    <label for="exportMd">
+                        <i class="fab fa-markdown"></i>
+                        <strong>Markdown (.md)</strong>
+                        <span>Markdown формат</span>
+                    </label>
+                </div>
+
+                <h4 style="margin-top: 20px;">Що включити:</h4>
+
+                <div class="export-checkbox">
+                    <input type="checkbox" id="includeTitle" checked>
+                    <label for="includeTitle">Назва книги</label>
+                </div>
+
+                <div class="export-checkbox">
+                    <input type="checkbox" id="includeAuthor" checked>
+                    <label for="includeAuthor">Автор</label>
+                </div>
+
+                <div class="export-checkbox">
+                    <input type="checkbox" id="includeTableOfContents" checked>
+                    <label for="includeTableOfContents">Зміст (Table of Contents)</label>
+                </div>
+
+                <div class="export-checkbox">
+                    <input type="checkbox" id="includeChapterNumbers" checked>
+                    <label for="includeChapterNumbers">Нумерація глав</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn secondary" id="cancelExportBtn">Скасувати</button>
+            <button class="btn primary" id="confirmExportBtn">
+                <i class="fas fa-download"></i> Експортувати
+            </button>
+        </div>
+    </div>
+</div>

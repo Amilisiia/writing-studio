@@ -1,0 +1,207 @@
+﻿.statistics-page {
+    padding: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Великі картки статистики */
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.stat-big-card {
+    background: linear-gradient(135deg, var(--bg-white) 0%, #f8f9fa 100%);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-left: 4px solid var(--primary-gold);
+    transition: all 0.3s ease;
+}
+
+    .stat-big-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .stat-big-card .stat-icon {
+        font-size: 48px;
+        opacity: 0.8;
+    }
+
+    .stat-big-card .stat-content {
+        flex: 1;
+    }
+
+    .stat-big-card .stat-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: var(--book-brown);
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+
+    .stat-big-card .stat-label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+/* Секції статистики */
+.chapters-stats-section,
+.progress-section,
+.characters-distribution {
+    background: var(--bg-white);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-soft);
+    margin-bottom: 30px;
+}
+
+    .chapters-stats-section h3,
+    .progress-section h3,
+    .characters-distribution h3 {
+        color: var(--book-brown);
+        margin-bottom: 20px;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+/* Таблиця глав */
+.chapters-stats-table {
+    overflow-x: auto;
+}
+
+    .chapters-stats-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .chapters-stats-table th {
+        background: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        font-weight: bold;
+        color: var(--book-brown);
+        border-bottom: 2px solid var(--primary-gold);
+    }
+
+    .chapters-stats-table td {
+        padding: 12px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .chapters-stats-table tr:hover {
+        background: #f8f9fa;
+    }
+
+/* Графіки */
+.progress-chart,
+.chart-container {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fafafa;
+    border-radius: 8px;
+}
+
+canvas {
+    max-height: 400px;
+}
+
+/* Модальне вікно експорту */
+.export-options {
+    padding: 20px 0;
+}
+
+.export-option {
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+    .export-option:hover {
+        border-color: var(--primary-gold);
+        background: #fafafa;
+    }
+
+    .export-option input[type="radio"] {
+        display: none;
+    }
+
+        .export-option input[type="radio"]:checked + label {
+            color: var(--book-brown);
+        }
+
+        .export-option input[type="radio"]:checked ~ label::before {
+            content: "✓ ";
+            color: var(--primary-gold);
+        }
+
+    .export-option label {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+        .export-option label i {
+            font-size: 24px;
+            color: var(--primary-gold);
+        }
+
+        .export-option label strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .export-option label span {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+.export-checkbox {
+    padding: 10px 0;
+}
+
+    .export-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-gold);
+        margin-right: 10px;
+    }
+
+    .export-checkbox label {
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .statistics-page {
+        padding: 20px;
+    }
+
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-big-card {
+        padding: 20px;
+    }
+
+        .stat-big-card .stat-number {
+            font-size: 28px;
+        }
+}
